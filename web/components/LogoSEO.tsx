@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import { DOMAIN } from 'common/envs/constants'
 
 export function LogoSEO() {
   return (
@@ -9,8 +10,8 @@ export function LogoSEO() {
           __html: `{
       "@context": "https://schema.org",
       "@type": "Corporation",
-      "url": "https://manifold.markets",
-      "logo": "https://manifold.markets/logo.svg",
+      "url": "https://${DOMAIN}",
+      "logo": "https://${DOMAIN}/logo.svg",
       "description": "Create your own prediction market. Unfold the future."
     }`,
         }}

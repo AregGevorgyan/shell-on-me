@@ -21,13 +21,10 @@ import { average } from 'common/util/math'
 import { useCallback, useState } from 'react'
 import { Button } from 'web/components/buttons/button'
 import {
-  MANA_PURCHASE_RATE_CHANGE_DATE,
-  MANA_PURCHASE_RATE_REVERT_DATE,
   TRADE_TERM,
   TRADED_TERM,
 } from 'common/envs/constants'
 import { capitalize, partition } from 'lodash'
-import { formatTimeShort } from 'client-common/lib/time'
 import { InfoTooltip } from 'web/components/widgets/info-tooltip'
 import { TopicDauSummary } from 'web/components/stats/topic-dau-summary'
 import { Contract, contractPath } from 'common/contract'
@@ -562,11 +559,11 @@ function ManaSupplyTab(props: {
   const differenceInSupplySinceYesterday =
     currentSupply.total_value - yesterdaySupply.total_value
 
-  const [fromBankSummaryCash, fromBankSummaryMana] = partition(
+  const [, fromBankSummaryMana] = partition(
     fromBankSummary,
     (f) => f.token === 'CASH'
   )
-  const [toBankSummaryCash, toBankSummaryMana] = partition(
+  const [, toBankSummaryMana] = partition(
     toBankSummary,
     (f) => f.token === 'CASH'
   )
@@ -704,13 +701,6 @@ function ManaSalesTab(props: { stats: rowfor<'daily_stats'>[] }) {
           },
         ]}
       />
-      <Spacer h={8} />
-      <span className="text-ink-500 italic">
-        mana purchased divided by 100, except from{' '}
-        {formatTimeShort(MANA_PURCHASE_RATE_CHANGE_DATE.valueOf())} to{' '}
-        {formatTimeShort(MANA_PURCHASE_RATE_REVERT_DATE.valueOf())} it is
-        divided by 1000
-      </span>
     </Col>
   )
 }

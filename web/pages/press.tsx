@@ -8,6 +8,7 @@ import { BadgeCheckIcon, ShieldCheckIcon } from '@heroicons/react/outline'
 import { BsFillArrowThroughHeartFill } from 'react-icons/bs'
 import { LuSprout } from 'react-icons/lu'
 import { GiBurningSkull, GiOpenChest, GiTwoCoins } from 'react-icons/gi'
+import { DOMAIN } from 'common/envs/constants'
 import ScalesIcon from 'web/lib/icons/scales-icon.svg'
 import Foldy from 'web/public/logo.svg'
 import { useState } from 'react'
@@ -23,6 +24,7 @@ type BadgeInfo = {
 
 export default function PressPage() {
   const [selectedBadge, setSelectedBadge] = useState<BadgeInfo | null>(null)
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? `info@${DOMAIN}`
 
   const badges: BadgeInfo[] = [
     {
@@ -604,10 +606,10 @@ export default function PressPage() {
                 <p className="text-ink-600">
                   For press inquiries and additional assets, please contact:{' '}
                   <a
-                    href="mailto:info@manifold.markets"
+                    href={`mailto:${supportEmail}`}
                     className="text-primary-500 hover:text-primary-600 underline"
                   >
-                    info@manifold.markets
+                    {supportEmail}
                   </a>
                 </p>
               </div>

@@ -14,16 +14,19 @@ type EmbedPattern = {
   rewrite: (text: string) => string
 }
 
+const escapedDomain = DOMAIN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 const embedPatterns: EmbedPattern[] = [
   {
     regex: /^(<iframe.*<\/iframe>)$/,
     rewrite: (text: string) => text,
   },
   {
-    regex: /^https?:\/\/manifold\.markets\/([^\/]+\/[^\/]+)/,
+    regex: new RegExp(
+      `^https?:\\/\\/(?:[^\\/]+\\.)?${escapedDomain}\\/([^\\/]+\\/[^\\/]+)`
+    ),
     // regex: /^http?:\/\/localhost:3000\/([^\/]+\/[^\/]+)/,
-    rewrite: (slug) =>
-      `<iframe src="https://manifold.markets/embed/${slug}"></iframe>`,
+    rewrite: (slug) => `<iframe src="https://${DOMAIN}/embed/${slug}"></iframe>`,
     // `<iframe src="http://localhost:3000/embed/${slug}"></iframe>`,
   },
   {

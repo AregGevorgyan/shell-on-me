@@ -29,6 +29,11 @@ import { removeUndefinedProps } from 'common/util/object'
 import { createSupabaseDirectClient } from 'shared/supabase/init'
 import { HOUR_MS } from 'common/util/time'
 
+const APP_NAME = 'StartupShell'
+const NO_REPLY_FROM = `${APP_NAME} <no-reply@${DOMAIN}>`
+const INFO_EMAIL = `info@${DOMAIN}`
+const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN ?? `mg.${DOMAIN}`
+
 export type PerContractInvestmentsData = {
   questionTitle: string
   questionUrl: string
@@ -225,7 +230,7 @@ export const sendWelcomeEmail = async (
       unsubscribeUrl,
     },
     {
-      from: 'Stefanie from Manifold <stefanie@manifold.markets>',
+      from: `Stefanie from ${APP_NAME} <${INFO_EMAIL}>`,
       'o:deliverytime': new Date(Date.now() + 2 * HOUR_MS).toUTCString(),
     }
   )
@@ -238,14 +243,13 @@ export const sendBulkEmails = async (
   subject: string,
   template: string,
   recipients: EmailAndTemplateEntry[],
-  from = `Manifold <no-reply@manifold.markets>`
+  from = NO_REPLY_FROM
 ) => {
   // Mailgun has a limit of 1000 recipients per batch
   const emailChunks = chunk(recipients, 1000)
   for (const chunk of emailChunks) {
-    const mailgunDomain = 'mg.manifold.markets'
     const mailgunApiKey = process.env.MAILGUN_KEY as string
-    const url = `https://api.mailgun.net/v3/${mailgunDomain}/messages`
+    const url = `https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`
     const data = new URLSearchParams()
     data.append('from', from)
     data.append('subject', subject)
@@ -289,17 +293,17 @@ export const sendPersonalFollowupEmail = async (
 
   const emailBody = `Hi ${firstName},
 
-Thanks for signing up! I'm one of the cofounders of Manifold, and was wondering how you've found your experience on the platform so far?
+Thanks for signing up! I'm one of the cofounders of StartupShell, and was wondering how you've found your experience on the platform so far?
 
-If you haven't already, I encourage you to try creating your own prediction market (https://manifold.markets/create) and joining our Discord chat (https://discord.com/invite/eHQBNBqXuh).
+If you haven't already, I encourage you to try creating your own prediction market (https://${DOMAIN}/create) and joining our Discord chat (https://discord.com/invite/eHQBNBqXuh).
 
 Feel free to reply to this email with any questions or concerns you have.
 
 Cheers,
 
 James
-Cofounder of Manifold
-https://manifold.markets
+Cofounder of StartupShell
+https://${DOMAIN}
  `
 
   await sendTextEmail(
@@ -307,7 +311,7 @@ https://manifold.markets
     'How are you finding Manifold?',
     emailBody,
     {
-      from: 'James from Manifold <james@manifold.markets>',
+      from: `James from ${APP_NAME} <${INFO_EMAIL}>`,
       'o:deliverytime': sendTime,
     }
   )
@@ -335,7 +339,7 @@ export const sendCreatorGuideEmail = async (
       unsubscribeUrl,
     },
     {
-      from: 'Stefanie from Manifold <stefanie@manifold.markets>',
+      from: `Stefanie from ${APP_NAME} <${INFO_EMAIL}>`,
     }
   )
 }
@@ -364,7 +368,7 @@ export const sendUnactivatedNewUserEmail = async (
       unsubscribeUrl,
     },
     {
-      from: 'Ian from Manifold <ian@manifold.markets>',
+      from: `Ian from ${APP_NAME} <${INFO_EMAIL}>`,
     }
   )
 }
@@ -392,7 +396,7 @@ export const sendThankYouEmail = async (
       unsubscribeUrl,
     },
     {
-      from: 'Stefanie from Manifold <stefanie@manifold.markets>',
+      from: `Stefanie from ${APP_NAME} <${INFO_EMAIL}>`,
     }
   )
 }
@@ -500,7 +504,7 @@ export const sendNewAnswerEmail = async (
   const marketUrl = `https://${DOMAIN}/${creatorUsername}/${slug}`
 
   const subject = `New answer on ${question}`
-  const from = `${name} <info@manifold.markets>`
+  const from = `${name} <${INFO_EMAIL}>`
 
   return await sendTemplateEmail(
     privateUser.email,
@@ -684,7 +688,7 @@ export const sendNewPrivateMarketEmail = async (
       groupName,
     },
     {
-      from: `${creatorName} on Manifold <no-reply@manifold.markets>`,
+      from: `${creatorName} on ${APP_NAME} <no-reply@${DOMAIN}>`,
     }
   )
 }
@@ -746,7 +750,7 @@ export const sendNewUniqueBettorsEmail = async (
     'new-unique-traders',
     templateData,
     {
-      from: `Manifold <no-reply@manifold.markets>`,
+      from: NO_REPLY_FROM,
     }
   )
 }

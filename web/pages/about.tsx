@@ -1,4 +1,4 @@
-import { TRADE_TERM } from 'common/envs/constants'
+import { DOMAIN, TRADE_TERM } from 'common/envs/constants'
 import {
   ChartBarIcon,
   LightBulbIcon,
@@ -17,6 +17,9 @@ import { LabCard } from './lab'
 import { Socials } from 'web/components/socials'
 
 export default function AboutPage() {
+  const docsBaseUrl =
+    process.env.NEXT_PUBLIC_DOCS_BASE_URL ?? `https://${DOMAIN}`
+
   return (
     <Page trackPageView={'about page'} className="!col-span-7">
       <SEO
@@ -76,7 +79,7 @@ export default function AboutPage() {
             <div className="mt-4 grid gap-x-2 md:grid-cols-3">
               <LabCard
                 title="FAQ"
-                href="https://docs.manifold.markets/faq"
+                href={`${docsBaseUrl}/faq`}
                 target="_blank"
                 description="Answers to common questions"
               />

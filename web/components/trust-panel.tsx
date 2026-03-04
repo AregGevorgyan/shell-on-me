@@ -1,7 +1,7 @@
 import { Col } from './layout/col'
 import { ExpandSection } from './explainer-panel'
 import { track } from 'web/lib/service/analytics'
-import { TRADE_TERM } from 'common/envs/constants'
+import { DOMAIN, TRADE_TERM } from 'common/envs/constants'
 
 export const TrustPanel = (props: { className?: string }) => {
   const { className } = props
@@ -98,7 +98,7 @@ export const LowTraders = ({
       <a
         className="text-primary-700 hover:underline"
         target="_blank"
-        href="https://manifold.markets/vluzko/after-how-many-unique-traders-will#EiWKtYBZaWvQbj27W6tT"
+        href={`https://${DOMAIN}/vluzko/after-how-many-unique-traders-will#EiWKtYBZaWvQbj27W6tT`}
       >
         data
       </a>

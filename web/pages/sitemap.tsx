@@ -26,7 +26,7 @@ import {
   ExternalLinkIcon,
   MapIcon,
 } from '@heroicons/react/outline'
-import { TRADE_TERM } from 'common/envs/constants'
+import { DOMAIN, TRADE_TERM } from 'common/envs/constants'
 import { Col } from 'web/components/layout/col'
 import { Row } from 'web/components/layout/row'
 import { Page } from 'web/components/layout/page'
@@ -39,6 +39,8 @@ import { Socials } from 'web/components/socials'
 export default function SitemapPage() {
   const { isNative, platform } = getNativePlatform()
   const user = useUser()
+  const docsBaseUrl =
+    process.env.NEXT_PUBLIC_DOCS_BASE_URL ?? `https://${DOMAIN}`
 
   return (
     <Page trackPageView={'sitemap page'}>
@@ -200,7 +202,7 @@ export default function SitemapPage() {
             <SitemapLink
               title="FAQ"
               description="Frequently asked questions"
-              href="https://docs.manifold.markets/faq"
+              href={`${docsBaseUrl}/faq`}
               external
               icon={QuestionMarkCircleIcon}
             />
@@ -213,7 +215,7 @@ export default function SitemapPage() {
             <SitemapLink
               title="API documentation"
               description="Build with our API"
-              href="https://docs.manifold.markets/api"
+              href={`${docsBaseUrl}/api`}
               external
               icon={CodeIcon}
             />

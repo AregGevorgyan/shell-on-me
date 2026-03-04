@@ -7,6 +7,7 @@ import { getApiUrl } from 'common//api/utils'
 import { trackPublicEvent } from 'shared/analytics'
 import { createSupabaseDirectClient } from 'shared/supabase/init'
 import { updatePrivateUser } from 'shared/supabase/users'
+import { ENV_CONFIG } from 'common/envs/constants'
 
 export const unsubscribe = async (req: Request, res: Response) => {
   const id = req.query.id as string
@@ -58,6 +59,8 @@ export const unsubscribe = async (req: Request, res: Response) => {
   const pg = createSupabaseDirectClient()
   await updatePrivateUser(pg, id, update)
   const unsubscribeEndpoint = getApiUrl('unsubscribe')
+  const siteUrl = `https://${ENV_CONFIG.domain}`
+  const logoUrl = `${siteUrl}/logo-banner.png`
 
   const optOutAllUrl = `${unsubscribeEndpoint}?id=${id}&type=${optOutAllType}`
   if (wantsToOptOutAll) {
@@ -172,8 +175,8 @@ export const unsubscribe = async (req: Request, res: Response) => {
               <tbody>
               <tr>
                 <td style="width:550px;">
-                  <a href="https://manifold.markets" target="_blank">
-                    <img alt="banner logo" height="auto" src="https://manifold.markets/logo-banner.png"
+                  <a href="${siteUrl}" target="_blank">
+                    <img alt="banner logo" height="auto" src="${logoUrl}"
                          style="border:none;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;"
                          title="" width="550">
                   </a>
@@ -325,8 +328,8 @@ export const unsubscribe = async (req: Request, res: Response) => {
                             <tbody>
                             <tr>
                                 <td style="width:550px;">
-                                    <a href="https://manifold.markets" target="_blank">
-                                        <img alt="banner logo" height="auto" src="https://manifold.markets/logo-banner.png"
+                                    <a href="${siteUrl}" target="_blank">
+                                        <img alt="banner logo" height="auto" src="${logoUrl}"
                                              style="border:none;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;"
                                              title="" width="550">
                                     </a>
@@ -372,7 +375,7 @@ export const unsubscribe = async (req: Request, res: Response) => {
                                         <br/>
                                         <br/>
                     <span>Click
-                    <a href='https://manifold.markets/notifications?tab=settings'>here</a>
+                    <a href='${siteUrl}/notifications?tab=settings'>here</a>
                        to manage the rest of your notification settings.
                       </span>
                                     </div>

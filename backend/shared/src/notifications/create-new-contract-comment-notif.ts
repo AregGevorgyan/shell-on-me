@@ -25,7 +25,7 @@ import {
   getUniqueBettorIds,
   getUniqueVoterIds,
 } from 'shared/supabase/contracts'
-import { isAdminId, isModId } from 'common/envs/constants'
+import { DOMAIN, isAdminId, isModId } from 'common/envs/constants'
 import { bulkInsertNotifications } from 'shared/supabase/notifications'
 import { convertPrivateUser } from 'common/supabase/users'
 import { nanoid } from 'common/util/random'
@@ -240,7 +240,7 @@ export const createCommentOnContractNotification = async (
     `Comment on ${sourceContract.question}`,
     'market-comment-bulk',
     bulkEmails,
-    `${sourceUser.name} on Manifold <no-reply@manifold.markets>`
+    `${sourceUser.name} on StartupShell <no-reply@${DOMAIN}>`
   )
 }
 
@@ -466,7 +466,7 @@ export const createCommentOnPostNotification = async (
       `Comment on post: ${postTitle}`,
       'market-comment-bulk',
       bulkEmails,
-      `${commentCreator.name} on Manifold <no-reply@manifold.markets>`
+      `${commentCreator.name} on StartupShell <no-reply@${DOMAIN}>`
     )
   }
 

@@ -3,7 +3,6 @@ import { useNativeMessages } from 'web/hooks/use-native-messages'
 import { MesageTypeMap, nativeToWebMessageType } from 'common/native-message'
 import { WebPriceInDollars } from 'common/economy'
 import { postMessageToNative } from 'web/lib/native/post-message'
-import { api } from 'web/lib/api/api'
 
 export function useIosPurchases(
   setError: (error: string | null) => void,
@@ -17,21 +16,12 @@ export function useIosPurchases(
     data: MesageTypeMap[T]
   ) => {
     if (type === 'iapReceipt' && !loadingMessage) {
-      setLoadingMessage('Validating receipt, hold on...')
-      const { receipt } = data as MesageTypeMap['iapReceipt']
-      try {
-        await api('validateIap', { receipt })
-        console.log('iap receipt validated')
-        setError(null)
-        setLoadingMessage(null)
-        setLoadingPrice(null)
-        onSuccess()
-      } catch (e) {
-        console.error('iap receipt validation error', e)
-        setError('Error validating receipt')
-        setLoadingMessage(null)
-        setLoadingPrice(null)
-      }
+      void data
+      setLoadingMessage(null)
+      setLoadingPrice(null)
+      setError(
+        'In-app purchases are disabled for this StartupShell deployment.'
+      )
     } else if (type === 'iapError') {
       setError('Error during purchase! Try again.')
       setLoadingMessage(null)
@@ -42,12 +32,14 @@ export function useIosPurchases(
   useNativeMessages(['iapReceipt', 'iapError'], handleIapReceipt)
 
   const initiatePurchaseInDollars = (amountInDollars: number) => {
+    void amountInDollars
     setError(null)
-    setLoadingPrice(amountInDollars as WebPriceInDollars)
+    setLoadingPrice(null)
     setLoadingMessage(null)
-    console.log('initiating purchase', amountInDollars)
-    // Expects cents
-    postMessageToNative('checkout', { amount: amountInDollars * 100 })
+    setError('In-app purchases are disabled for this StartupShell deployment.')
+    postMessageToNative('log', {
+      args: ['iOS purchase disabled in StartupShell deployment'],
+    })
   }
 
   return {

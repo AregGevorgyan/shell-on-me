@@ -7,11 +7,7 @@ import {
 } from 'common/user'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import {
-  GoogleAuthProvider,
-  OAuthProvider,
-  signInWithPopup,
-} from 'firebase/auth'
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import { getIsNative } from 'web/lib/native/is-native'
 import { nativeSignOut } from 'web/lib/native/native-messages'
 import { postMessageToNative } from 'web/lib/native/post-message'
@@ -26,6 +22,15 @@ export type { User }
 export const auth = getFirebaseAuth()
 export const CACHED_REFERRAL_USERNAME_KEY = 'CACHED_REFERRAL_KEY'
 const CACHED_REFERRAL_CONTRACT_ID_KEY = 'CACHED_REFERRAL_CONTRACT_KEY'
+const STARTUPSHELL_EMAIL_DOMAIN = '@startupshell.org'
+
+const assertStartupShellEmail = async (email: string | null | undefined) => {
+  const normalizedEmail = email?.toLowerCase()
+  if (!normalizedEmail?.endsWith(STARTUPSHELL_EMAIL_DOMAIN)) {
+    await auth.signOut()
+    throw new Error('Sign in with your @startupshell.org Google account.')
+  }
+}
 
 // Scenarios:
 // 1. User is referred by another user to homepage, group page, market page etc. explicitly via referrer= query param
@@ -97,22 +102,9 @@ export async function firebaseLogin() {
   }
   const provider = new GoogleAuthProvider()
   return signInWithPopup(auth, provider).then(async (result) => {
+    await assertStartupShellEmail(result.user.email)
     return result
   })
-}
-
-export async function loginWithApple() {
-  const provider = new OAuthProvider('apple.com')
-  provider.addScope('email')
-  provider.addScope('name')
-
-  return signInWithPopup(auth, provider)
-    .then((result) => {
-      return result
-    })
-    .catch((error) => {
-      console.error(error)
-    })
 }
 
 export async function firebaseLogout() {

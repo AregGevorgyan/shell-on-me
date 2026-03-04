@@ -1,6 +1,7 @@
 // Adopted from https://github.com/ueberdosis/tiptap/blob/main/demos/src/Experiments/Embeds/Vue/iframe.ts
 
 import { Node, mergeAttributes } from '@tiptap/core'
+import { DOMAIN } from 'common/envs/constants'
 
 export interface IframeOptions {
   HTMLAttributes: {
@@ -68,7 +69,7 @@ export default Node.create<IframeOptions>({
 
     // This is a hack to prevent native from opening the iframe in an in-app browser
     // and mobile in another tab. In native, links with target='_blank' open in the in-app browser.
-    if (src.includes('manifold.markets/embed/')) {
+    if (src.includes(`${DOMAIN}/embed/`)) {
       return [
         'div',
         {

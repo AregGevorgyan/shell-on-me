@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import clsx from 'clsx'
+import { DOMAIN } from 'common/envs/constants'
 
 import { Page } from 'web/components/layout/page'
 import { SEO } from 'web/components/SEO'
@@ -714,7 +715,7 @@ function ShareButton(props: {
       return marketAttempt.feedback.map(getFeedbackEmoji).join('')
     })
 
-    const url = `https://manifold.markets/predictle${
+    const url = `https://${DOMAIN}/predictle${
       username ? referralQuery(username) : ''
     }`
 
@@ -785,7 +786,7 @@ export default function PredictlePage() {
         title="Predictle"
         description="A daily game where you arrange prediction markets by probability."
         url="/predictle"
-        image="https://manifold.markets/predictle-logo.png"
+        image={`https://${DOMAIN}/predictle-logo.png`}
       />
       {/* Wrapper needed for iOS absolute positioning */}
       <div

@@ -2,11 +2,9 @@ import dayjs from 'dayjs'
 import { Col } from 'web/components/layout/col'
 import {
   formatMoney,
-  formatMoneyUSD,
   formatSpice,
   formatSweepies,
   formatWithToken,
-  maybePluralize,
 } from 'common/util/format'
 import { Row } from 'web/components/layout/row'
 import clsx from 'clsx'
@@ -36,11 +34,9 @@ import { assertUnreachable } from 'common/util/types'
 import { AnyTxnCategory } from 'common/txn'
 import { useAPIGetter } from 'web/hooks/use-api-getter'
 import { Button } from 'web/components/buttons/button'
-import { Modal } from '../layout/modal'
 import { QuestType } from 'common/quest'
 import { PROFIT_FEE_FRACTION } from 'common/economy'
 import { CalendarIcon } from '@heroicons/react/solid'
-import DropdownMenu from '../widgets/dropdown-menu'
 
 export const BalanceChangeTable = (props: { user: User }) => {
   const { user } = props
@@ -57,10 +53,6 @@ export const BalanceChangeTable = (props: { user: User }) => {
   })
 
   const [query, setQuery] = useState('')
-  const { data: cashouts } = useAPIGetter('get-cashouts', {
-    userId: user.id,
-  })
-  const [showCashoutModal, setShowCashoutModal] = useState(false)
   const balanceChanges = (allBalanceChanges ?? []).filter((change) => {
     const { type } = change
     const contractQuestion =
@@ -85,11 +77,6 @@ export const BalanceChangeTable = (props: { user: User }) => {
       betText.toLowerCase().includes(query.toLowerCase())
     )
   })
-  const pendingCashouts =
-    cashouts?.filter((c) => c.txn.gidxStatus === 'Pending')?.length ?? 0
-
-  const hasCashouts = cashouts && cashouts.length > 0
-
   const relativeDateText = before
     ? `${formatJustDateShort(after)} - ${formatJustDateShort(before)}`
     : after === fourteenDaysAgo
@@ -155,20 +142,6 @@ export const BalanceChangeTable = (props: { user: User }) => {
             </Button>
           </Row>
         )}
-        {hasCashouts && (
-          <DropdownMenu
-            items={[
-              {
-                name: `View ${maybePluralize('redemption', cashouts.length)} ${
-                  pendingCashouts > 0 ? `(${pendingCashouts} pending)` : ''
-                }`,
-                onClick: () => setShowCashoutModal(true),
-              },
-            ]}
-            menuWidth="w-52"
-            buttonClass="px-2 py-1"
-          />
-        )}
       </Row>
       {!!before && before < Date.now() && (
         <Row className="text-ink-400 mt-4 items-center justify-center gap-6">
@@ -223,33 +196,6 @@ export const BalanceChangeTable = (props: { user: User }) => {
         </span>
         <div className="border-ink-400 grow border" />
       </Row>
-
-      <Modal open={showCashoutModal} setOpen={setShowCashoutModal}>
-        <Col className={'bg-canvas-0 gap-4 rounded-md p-4'}>
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="text-left">Amount</th>
-                <th className="text-left">Date</th>
-                <th className="text-left">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cashouts?.map((cashout) => (
-                <tr key={cashout.txn.id}>
-                  <td>{formatMoneyUSD(cashout.txn.payoutInDollars, true)}</td>
-                  <td className="whitespace-nowrap">
-                    {new Date(cashout.txn.createdTime).toLocaleString()}
-                  </td>
-                  <td className="whitespace-nowrap">
-                    {cashout.txn.gidxStatus}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Col>
-      </Modal>
     </Col>
   )
 }
@@ -262,8 +208,8 @@ function RenderBalanceChanges(props: {
 }) {
   const { balanceChanges, user, avatarSize, hideBalance } = props
   let currManaBalance = user.balance
-  let currCashBalance = user.cashBalance
-  let currSpiceBalance = user.spiceBalance
+  let currCashBalance = (user as any).cashBalance ?? 0
+  let currSpiceBalance = (user as any).spiceBalance ?? 0
   const balanceRunningTotals = [
     { mana: currManaBalance, cash: currCashBalance, spice: currSpiceBalance },
     ...balanceChanges.map((change) => {
@@ -484,13 +430,9 @@ const TxnBalanceChangeRow = (props: {
     CONTRACT_UNDO_PRODUCE_SPICE: 'bg-ink-1000',
     CONSUME_SPICE: 'bg-indigo-400',
     CONSUME_SPICE_DONE: 'bg-indigo-400',
-    CONVERT_CASH: 'bg-indigo-400',
-    CONVERT_CASH_DONE: 'bg-indigo-400',
     SIGNUP_BONUS: 'bg-yellow-200',
     KYC_BONUS: 'bg-yellow-200',
     REFERRAL: 'bg-blue-300',
-    MANA_PURCHASE: 'bg-gradient-to-br from-blue-400 via-green-100 to-green-300',
-    CASH_BONUS: 'bg-gradient-to-br from-blue-400 via-green-100 to-green-300',
     MARKET_BOOST_REDEEM: 'bg-purple-200',
     MARKET_BOOST_CREATE: 'bg-purple-400',
     LEAGUE_PRIZE: 'bg-indigo-400',
@@ -548,9 +490,7 @@ const TxnBalanceChangeRow = (props: {
             ) : type === 'CREATE_CONTRACT_ANTE' || type === 'BOUNTY_POSTED' ? (
               <ScaleIcon className={'-ml-[1px] mb-1 h-5 w-5'} />
             ) : type === 'CONSUME_SPICE' ||
-              type === 'CONSUME_SPICE_DONE' ||
-              type === 'CONVERT_CASH' ||
-              type === 'CONVERT_CASH_DONE' ? (
+              type === 'CONSUME_SPICE_DONE' ? (
               <FaArrowRightArrowLeft className={'h-4 w-4'} />
             ) : type === 'CHARITY_GIVEAWAY_TICKET' ? (
               '🎟️'
@@ -563,15 +503,12 @@ const TxnBalanceChangeRow = (props: {
               type === 'CASH_OUT' ||
               type === 'CONTRACT_RESOLUTION_FEE' ? (
               '🏦'
-            ) : type === 'MANA_PURCHASE' ? (
-              '🤑'
             ) : type === 'MEMBERSHIP_PAYMENT' ? (
               '⭐'
             ) : type === 'SHOP_PURCHASE' ? (
               '🛍️'
             ) : [
                 'UNIQUE_BETTOR_BONUS',
-                'CASH_BONUS',
                 'BETTING_STREAK_BONUS',
                 'SIGNUP_BONUS',
                 'KYC_BONUS',
@@ -609,12 +546,7 @@ const TxnBalanceChangeRow = (props: {
               {txnTitle(change)}
             </Link>
           ) : charity ? (
-            <Link
-              href={`/old-charity/${charity.slug}`}
-              className={clsx('line-clamp-2', linkClass)}
-            >
-              {txnTitle(change)}
-            </Link>
+            <div className={clsx('line-clamp-2')}>{txnTitle(change)}</div>
           ) : (
             <div className={clsx('line-clamp-2')}>{txnTitle(change)}</div>
           )}
@@ -697,8 +629,6 @@ const txnTitle = (change: TxnBalanceChange) => {
       return 'Margin Loan'
     case 'LEAGUE_PRIZE':
       return 'League prize'
-    case 'MANA_PURCHASE':
-      return 'Mana purchase'
     case 'MARKET_BOOST_REDEEM':
       return 'Claim boost'
     case 'SIGNUP_BONUS':
@@ -708,13 +638,8 @@ const txnTitle = (change: TxnBalanceChange) => {
     case 'CONSUME_SPICE':
     case 'CONSUME_SPICE_DONE':
       return `Redeem prize points for mana`
-    case 'CONVERT_CASH':
-    case 'CONVERT_CASH_DONE':
-      return 'Redeem sweepcash for mana'
     case 'CASH_OUT':
       return 'Redemption request'
-    case 'CASH_BONUS':
-      return 'Sweepcash bonus'
     case 'KYC_BONUS':
       return 'ID verification bonus'
     case 'CONTRACT_RESOLUTION_FEE':
@@ -764,15 +689,11 @@ const txnTypeToDescription = (txnCategory: string) => {
       return 'Unresolve'
     case 'CONSUME_SPICE':
     case 'CONSUME_SPICE_DONE':
-    case 'CONVERT_CASH':
-    case 'CONVERT_CASH_DONE':
       return ''
     case 'CONTRACT_RESOLUTION_FEE':
       return `${PROFIT_FEE_FRACTION * 100}% fee on profit at resolution`
     case 'UNDO_CONTRACT_RESOLUTION_FEE':
       return `Undo ${PROFIT_FEE_FRACTION * 100}% profit fee at resolution`
-    case 'MANA_PURCHASE':
-      return ''
     case 'ADD_SUBSIDY':
       return 'Subsidy'
     case 'MARKET_BOOST_REDEEM':

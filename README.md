@@ -1,48 +1,75 @@
-# Manifold
+# StartupShell Prediction Market
 
-This [monorepo][monorepo] has basically everything involved in running and operating Manifold.
+This repo is a customized fork of Manifold, converted into a private StartupShell internal prediction market.
 
-## Getting started
+## Scope
 
-0. Make sure you have [Yarn 1.x][yarn]
-1. `$ cd web`
-2. `$ yarn`
-3. `$ yarn dev:dev`
-4. Your site will be available on http://localhost:3000
+- Google auth only, restricted to `@startupshell.org` accounts
+- Fake-money trading (mana) only
+- StartupShell domain/environment defaults
+- Stripped packages/services not needed for the internal deployment
 
-See [`web/README.md`][web-readme] for more details on hacking on the web client.
+## Monorepo layout
 
-## General architecture
+- `web/`: Next.js frontend
+- `backend/api/`: internal Express API
+- `backend/shared/`: shared backend services/helpers
+- `common/`: shared types, domain logic, and env config
 
-Manifold's public API and web app are hosted by [Vercel][vercel]. Our data has been stored in Firebase's database [Cloud Firestore][cloud-firestore] but we have almost entirely migrated it to SQL hosted on [Supabase][supabase].
+## Requirements
 
-We often use supabase directly on the client to get the data. However, for complicated operations (like buying shares) we have a separate internal HTTP API deployed in a docker container in google cloud. This is separate from the public-facing api hosted via Vercel; see [`functions/README.md`][functions-readme] for more details.
+- Node.js 20+
+- npm 10+ (or Yarn 1.x if you prefer workspace scripts)
 
-## Directory overview
+## Install
 
-- [web/](./web/): UI and business logic for the client. Where most of the site lives. The public API endpoints are also in here.
+From repo root:
 
-- [backend/](./backend/): All the rest of the stuff we run on GCP.
+```bash
+npm install
+```
 
-- [common/](./common/): Typescript library code shared between `web/` & `backend/` & `shared/`. If you want to look at how the market math works, most of that's in here (it gets called from the `bet` and `sellBet` endpoints in `functions/`.) Also contains in `common/envs` configuration for the different environments (i.e. prod, dev, Manifold for Teams instances.)
+## Run locally
 
-- [docs/](./docs/): Manifold's public documentation that lives at https://docs.manifold.markets.
+Frontend:
 
-## Contributing
+```bash
+npm --prefix web run dev
+```
 
-We're pretty new to open-source culture so please be patient and let us know how we can do better. Feel free to open issues, submit PRs, and chat about the process on [Discord][discord]. We would prefer [small PRs][small-prs] that we can effectively evaluate and review - check in with us first if you want to work on a big change.
+Backend API:
 
-By contributing to this codebase, you are agreeing to the terms of the [Manifold CLA](./.github/CONTRIBUTING.md).
+```bash
+npm --prefix backend/api run dev
+```
 
-If you need additional access to any infrastructure in order to work on something (e.g. Vercel, Firebase, Supabase) let us know about that on [Discord][discord] as well.
+## Type/compile checks
 
-[vercel]: https://vercel.com/
-[monorepo]: https://semaphoreci.com/blog/what-is-monorepo
-[yarn]: https://classic.yarnpkg.com/lang/en/docs/install/
-[web-readme]: ./web/README.md
-[functions-readme]: ./backend/functions/README.md
-[supabase]: https://supabase.com/
-[cloud-firestore]: https://firebase.google.com/docs/firestore
-[cloud-functions]: https://firebase.google.com/docs/functions
-[small-prs]: https://google.github.io/eng-practices/review/developer/small-cls.html
-[discord]: https://discord.gg/3Zuth9792G
+Backend compile:
+
+```bash
+npm --prefix backend/api run compile
+```
+
+Web typecheck:
+
+```bash
+npx tsc --project web/tsconfig.json --noEmit
+```
+
+## Environment configuration
+
+Primary env config lives in:
+
+- `common/src/envs/prod.ts`
+- `common/src/envs/dev.ts`
+- `common/src/envs/constants.ts`
+
+Set `NEXT_PUBLIC_APP_DOMAIN`, Firebase, and Supabase vars for your StartupShell environments.
+
+## Design system
+
+The app now uses the StartupShell palette and Titillium Web base font:
+
+- Palette and token mappings: `web/styles/globals.css`
+- App font injection: `web/pages/_app.tsx`

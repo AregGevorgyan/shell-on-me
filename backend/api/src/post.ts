@@ -3,6 +3,7 @@ import { createCommentOnContractInternal } from 'api/create-comment'
 import { APIError, APIHandler } from 'api/helpers/endpoint'
 import { ContractComment } from 'common/comment'
 import { removeUndefinedProps } from 'common/util/object'
+import { DOMAIN } from 'common/envs/constants'
 import { trackPublicEvent } from 'shared/analytics'
 import { getComment } from 'shared/supabase/contract-comments'
 import { createSupabaseDirectClient } from 'shared/supabase/init'
@@ -117,7 +118,7 @@ const checkForNaughtyEmbeds = (content: JSONContent) => {
     (content.content?.filter((c) => c.type === 'iframe').length ?? 0) > 1 ||
     !!content.content?.find((c) => c.type === 'gridCardsComponent') ||
     !!content.content?.find(
-      (c) => c.type === 'iframe' && c.attrs?.src.includes('manifold.markets')
+      (c) => c.type === 'iframe' && c.attrs?.src.includes(DOMAIN)
     )
   ) {
     throw new APIError(

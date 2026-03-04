@@ -37,6 +37,14 @@ export type AuthedUser = {
 type JwtCredentials = { kind: 'jwt'; data: admin.auth.DecodedIdToken }
 type KeyCredentials = { kind: 'key'; data: string }
 type Credentials = JwtCredentials | KeyCredentials
+const STARTUPSHELL_EMAIL_DOMAIN = '@startupshell.org'
+
+const ensureAllowedEmailDomain = (decoded: admin.auth.DecodedIdToken) => {
+  const email = decoded.email?.toLowerCase()
+  if (!email || !email.endsWith(STARTUPSHELL_EMAIL_DOMAIN)) {
+    throw new APIError(403, 'Access restricted to StartupShell members.')
+  }
+}
 
 export const parseCredentials = async (req: Request): Promise<Credentials> => {
   const auth = admin.auth()
@@ -56,8 +64,11 @@ export const parseCredentials = async (req: Request): Promise<Credentials> => {
         throw new APIError(401, 'Firebase JWT payload undefined.')
       }
       try {
-        return { kind: 'jwt', data: await auth.verifyIdToken(payload) }
+        const decoded = await auth.verifyIdToken(payload)
+        ensureAllowedEmailDomain(decoded)
+        return { kind: 'jwt', data: decoded }
       } catch (err) {
+        if (err instanceof APIError) throw err
         // This is somewhat suspicious, so get it into the firebase console
         log.error('Error verifying Firebase JWT: ', { err, scheme, payload })
         throw new APIError(500, 'Error validating token.')

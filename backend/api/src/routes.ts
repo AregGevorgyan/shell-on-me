@@ -22,9 +22,6 @@ import { getTotalLoanAmount } from 'api/get-total-loan-amount'
 import { getTxnSummaryStats } from 'api/get-txn-summary-stats'
 import { getUniqueBetGroupCount } from 'api/get-unique-bet-groups'
 import { getUserLimitOrdersWithContracts } from 'api/get-user-limit-orders-with-contracts'
-import { completeCashoutSession } from 'api/gidx/complete-cashout-session'
-import { completeCheckoutSession } from 'api/gidx/complete-checkout-session'
-import { getCheckoutSession } from 'api/gidx/get-checkout-session'
 import { getMonitorStatus } from 'api/gidx/get-monitor-status'
 import { getVerificationDocuments } from 'api/gidx/get-verification-documents'
 import { getVerificationStatus } from 'api/gidx/get-verification-status'
@@ -39,10 +36,8 @@ import { recordContractInteraction } from 'api/record-contract-interaction'
 import { recordContractView } from 'api/record-contract-view'
 import { repayLoan } from 'api/repay-loan'
 import { requestLoan } from 'api/request-loan'
-import { requestOTP } from 'api/request-phone-otp'
 import { searchContractPositions } from 'api/search-contract-positions'
 import { updateMarket } from 'api/update-market'
-import { verifyPhoneNumber } from 'api/verify-phone-number'
 import { type APIPath } from 'common/api/schema'
 import { addBounty } from './add-bounty'
 import { addLiquidity } from './add-liquidity'
@@ -59,8 +54,6 @@ import { castpollvote } from './cast-poll-vote'
 import { checkPollSuggestion } from './check-poll-suggestion'
 import { checkSportsEvent } from './check-sports-event'
 import { closeMarket } from './close-market'
-import { convertCashToMana } from './convert-cash-to-mana'
-import { convertSpiceToMana } from './convert-sp-to-mana'
 import { createAnswerCPMM } from './create-answer-cpmm'
 import { createComment } from './create-comment'
 import { createManalink } from './create-manalink'
@@ -77,7 +70,6 @@ import { generateAIMarketSuggestions } from './generate-ai-market-suggestions'
 import { getSingleAnswer } from './get-answer'
 import { getBetPointsBetween, getBets } from './get-bets'
 import { getBettorsFromBetIds } from './get-bettors-from-bet-ids'
-import { getCashouts } from './get-cashouts'
 import {
   getCommentThread,
   getContractCommentThreads,
@@ -126,7 +118,6 @@ import { getUserPortfolioHistory } from './get-user-portfolio-history'
 import { getUserPrivateData } from './get-user-private-data'
 import { getUsers } from './get-users'
 import { getUserBalancesByIds, getUsersByIds } from './get-users-by-ids'
-import { completeCashoutRequest } from './gidx/complete-cashout-request'
 import { type APIHandler } from './helpers/endpoint'
 import { editComment } from './edit-comment'
 import { hideComment } from './hide-comment'
@@ -231,7 +222,6 @@ import { shopResetAll } from './shop-reset-all'
 import { shopToggle } from './shop-toggle'
 import { shopCancelSubscription } from './shop-cancel-subscription'
 import { updatePost } from './update-post'
-import { validateiap } from './validate-iap'
 
 export const handlers: { [k in APIPath]: APIHandler<k> } = {
   'refresh-all-clients': refreshAllClients,
@@ -308,8 +298,6 @@ export const handlers: { [k in APIPath]: APIHandler<k> } = {
   managrams: getManagrams,
   manalink: createManalink,
   donate: donate,
-  'convert-cash-to-mana': convertCashToMana,
-  'convert-sp-to-mana': convertSpiceToMana,
   'market/:id/positions': getPositions,
   me: getMe,
   'me/update': updateMe,
@@ -365,8 +353,6 @@ export const handlers: { [k in APIPath]: APIHandler<k> } = {
   'get-user-portfolio': getUserPortfolio,
   'get-user-portfolio-history': getUserPortfolioHistory,
   createuser: createuser,
-  'verify-phone-number': verifyPhoneNumber,
-  'request-otp': requestOTP,
   'multi-sell': multiSell,
   'get-feed': getFeed,
   'get-unified-feed': getUnifiedFeed,
@@ -379,17 +365,12 @@ export const handlers: { [k in APIPath]: APIHandler<k> } = {
   'get-active-user-mana-stats': getActiveUserManaStats,
   'get-top-markets-yesterday': getTopMarketsYesterday,
   'register-gidx': register,
-  'get-checkout-session-gidx': getCheckoutSession,
-  'complete-checkout-session-gidx': completeCheckoutSession,
-  'complete-cashout-session-gidx': completeCashoutSession,
-  'complete-cashout-request': completeCashoutRequest,
   'get-verification-status-gidx': getVerificationStatus,
   'upload-document-gidx': uploadDocument,
   'get-verification-documents-gidx': getVerificationDocuments,
   'get-monitor-status-gidx': getMonitorStatus,
   'get-best-comments': getBestComments,
   'record-comment-view': recordCommentView,
-  'get-cashouts': getCashouts,
   txns: getTxns,
   'toggle-system-trading-status': toggleSystemTradingStatus,
   leaderboard: getLeaderboard,
@@ -415,7 +396,6 @@ export const handlers: { [k in APIPath]: APIHandler<k> } = {
   'get-market-props': getMarketProps,
   'get-user-contract-metrics-with-contracts':
     getUserContractMetricsWithContracts,
-  validateIap: validateiap,
   'comment-reactions': getReactions,
   'mark-all-notifications-new': markallnotificationsnew,
   'get-contract-voters': getContractVoters,

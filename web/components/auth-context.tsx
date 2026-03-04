@@ -10,6 +10,7 @@ import { useStateCheckEquality } from 'web/hooks/use-state-check-equality'
 import {
   AUTH_COOKIE_NAME,
   BANNED_TRADING_USER_IDS,
+  DOMAIN,
   TEN_YEARS_SECS,
 } from 'common/envs/constants'
 import { getCookie, setCookie } from 'web/lib/util/cookie'
@@ -96,6 +97,7 @@ export function AuthProvider(props: {
     PrivateUser | undefined
   >(serverUser ? serverUser.privateUser : undefined)
   const [authLoaded, setAuthLoaded] = useState(false)
+  const supportEmail = `info@${DOMAIN}`
 
   const authUser = !user
     ? user
@@ -122,8 +124,8 @@ export function AuthProvider(props: {
         authUser.user.userDeleted
       ) {
         const message = authUser.user.userDeleted
-          ? 'You have deleted the account associated with this email. To restore your account please email info@manifold.markets'
-          : 'You are banned from trading. To learn more please email info@manifold.markets'
+          ? `You have deleted the account associated with this email. To restore your account please email ${supportEmail}`
+          : `You are banned from trading. To learn more please email ${supportEmail}`
 
         firebaseLogout().then(() => {
           alert(message)
@@ -221,7 +223,7 @@ export function AuthProvider(props: {
     if (authLoaded && listenUser) {
       if (user) {
         const balanceChange = listenUser.balance - user.balance
-        const cashBalanceChange = listenUser.cashBalance - user.cashBalance
+        const cashBalanceChange = 0
 
         if (balanceChange > 0 || cashBalanceChange > 0) {
           showToast(balanceChange, cashBalanceChange)

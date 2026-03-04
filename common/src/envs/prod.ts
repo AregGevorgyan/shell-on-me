@@ -46,41 +46,58 @@ type FirebaseConfig = {
   measurementId: string
 }
 
-export const PROD_CONFIG: EnvConfig = {
-  domain: 'manifold.markets',
-  amplitudeApiKey: '2d6509fd4185ebb8be29709842752a15',
-  supabaseInstanceId: 'pxidrgkatumlvfqaxcll',
-  supabaseAnonKey:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4aWRyZ2thdHVtbHZmcWF4Y2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njg5OTUzOTgsImV4cCI6MTk4NDU3MTM5OH0.d_yYtASLzAoIIGdXUBIgRAGLBnNow7JG2SoaNMQ8ySg',
-  googleAnalyticsId: 'GTM-MLMPXHJ6',
-  firebaseConfig: {
-    apiKey: 'AIzaSyDp3J57vLeAZCzxLD-vcPaGIkAmBoGOSYw',
-    authDomain: 'mantic-markets.firebaseapp.com',
-    projectId: 'mantic-markets',
-    region: 'us-central1',
-    storageBucket: 'mantic-markets.appspot.com',
-    privateBucket: 'mantic-markets-private',
-    messagingSenderId: '128925704902',
-    appId: '1:128925704902:web:f61f86944d8ffa2a642dc7',
-    measurementId: 'G-SSFK1Q138D',
-  },
-  twitchBotEndpoint: 'https://twitch-bot.manifold.markets',
-  apiEndpoint: 'api.manifold.markets',
-  cloudRunId: 'nggbo3neva',
-  cloudRunRegion: 'uc',
+const env = (key: string, fallback: string) => process.env[key] ?? fallback
+const listEnv = (key: string, fallback: string[]) => {
+  const raw = process.env[key]
+  if (!raw) return fallback
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+}
 
-  adminIds: [
-    'IPTOzEqrpkWmEzh6hwvAyY9PqFb2', // Manifold
-    'tlmGNz9kjXc2EteizMORes4qvWl2', // Stephen
-    'AJwLWoo3xue32XIiAVrL5SyR1WB2', // Ian
-    'KHX2ThSFtLQlau58hrjtCX7OL2h2', // stefanie
-    'cA1JupYR5AR8btHUs2xvkui7jA93', // Genzy
-    '799tbR05zWe23KnLg5esZaHmuxi2', // Manifold Mod
-    'vuI5upWB8yU00rP7yxj95J2zd952', // Manifold Politics
-    '8lZo8X5lewh4hnCoreI7iSc0GxK2', // Manifold AI
-    'mwaVAaKkabODsH8g5VrtbshsXz03', // Ian's alt
-  ],
-  visibility: 'PUBLIC',
+const prodDomain = env('NEXT_PUBLIC_APP_DOMAIN', 'startupshell.org')
+const prodFirebaseProjectId = env(
+  'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+  'startupshell'
+)
+
+export const PROD_CONFIG: EnvConfig = {
+  domain: prodDomain,
+  amplitudeApiKey: env('NEXT_PUBLIC_AMPLITUDE_API_KEY', ''),
+  supabaseInstanceId: env('NEXT_PUBLIC_SUPABASE_INSTANCE_ID', ''),
+  supabaseAnonKey: env('NEXT_PUBLIC_SUPABASE_ANON_KEY', ''),
+  googleAnalyticsId: env('NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID', ''),
+  firebaseConfig: {
+    apiKey: env('NEXT_PUBLIC_FIREBASE_API_KEY', ''),
+    authDomain: env(
+      'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
+      `${prodFirebaseProjectId}.firebaseapp.com`
+    ),
+    projectId: prodFirebaseProjectId,
+    region: env('NEXT_PUBLIC_FIREBASE_REGION', 'us-central1'),
+    storageBucket: env(
+      'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
+      `${prodFirebaseProjectId}.appspot.com`
+    ),
+    privateBucket: env(
+      'NEXT_PUBLIC_FIREBASE_PRIVATE_BUCKET',
+      `${prodFirebaseProjectId}-private`
+    ),
+    messagingSenderId: env('NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID', ''),
+    appId: env('NEXT_PUBLIC_FIREBASE_APP_ID', ''),
+    measurementId: env('NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID', ''),
+  },
+  twitchBotEndpoint: env(
+    'NEXT_PUBLIC_TWITCH_BOT_ENDPOINT',
+    `https://twitch-bot.${prodDomain}`
+  ),
+  apiEndpoint: env('NEXT_PUBLIC_API_ENDPOINT', `api.${prodDomain}`),
+  cloudRunId: env('NEXT_PUBLIC_CLOUD_RUN_ID', ''),
+  cloudRunRegion: env('NEXT_PUBLIC_CLOUD_RUN_REGION', 'uc'),
+
+  adminIds: listEnv('STARTUPSHELL_ADMIN_IDS', []),
+  visibility: 'PRIVATE',
 
   moneyMoniker: 'Ṁ',
   spiceMoniker: 'P',
@@ -89,21 +106,16 @@ export const PROD_CONFIG: EnvConfig = {
   nounBet: 'trade',
   faviconPath: '/favicon.ico',
   newQuestionPlaceholders: [
-    'Will anyone I know get engaged this year?',
-    'Will humans set foot on Mars by the end of 2030?',
-    'Will any cryptocurrency eclipse Bitcoin by market cap this year?',
-    'Will the Democrats win the 2024 presidential election?',
+    'Will we hit this quarter revenue target?',
+    'Will we ship the roadmap feature by the target date?',
+    'Will we close the next enterprise customer this month?',
+    'Will our next demo day result in a signed pilot?',
   ],
   expoConfig: {
-    iosClientId:
-      '128925704902-n0ic4j1s5tk51t2vu8anu8glh3t5jimo.apps.googleusercontent.com',
-    iosClientId2:
-      '128925704902-k6d8219pss8nubk1bb1n5kisn5l8fv1a.apps.googleusercontent.com',
-    expoClientId:
-      '128925704902-bpcbnlp2gt73au3rrjjtnup6cskr89p0.apps.googleusercontent.com',
-    androidClientId:
-      '128925704902-ur9hevfika2rs0sni6ju236u82hbct3i.apps.googleusercontent.com',
-    androidClientId2:
-      '128925704902-r23bsi4ca28sprdh49mprl1ov33pvvau.apps.googleusercontent.com',
+    iosClientId: process.env.EXPO_IOS_CLIENT_ID,
+    iosClientId2: process.env.EXPO_IOS_CLIENT_ID_2,
+    expoClientId: process.env.EXPO_CLIENT_ID,
+    androidClientId: process.env.EXPO_ANDROID_CLIENT_ID,
+    androidClientId2: process.env.EXPO_ANDROID_CLIENT_ID_2,
   },
 }

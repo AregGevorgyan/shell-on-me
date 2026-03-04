@@ -68,10 +68,17 @@ export default function Leaderboards() {
       let manaProfit = 0,
         cashProfit = 0
       if (p) {
+        const portfolioAny = p as any
         manaProfit =
           p.profit ??
-          p.balance + p.spiceBalance + p.investmentValue - p.totalDeposits
-        cashProfit = p.cashBalance + p.cashInvestmentValue - p.totalCashDeposits
+          p.balance +
+            (portfolioAny.spiceBalance ?? 0) +
+            p.investmentValue -
+            p.totalDeposits
+        cashProfit =
+          (portfolioAny.cashBalance ?? 0) +
+          (portfolioAny.cashInvestmentValue ?? 0) -
+          (portfolioAny.totalCashDeposits ?? 0)
       }
 
       const { count: numUsers } = await db

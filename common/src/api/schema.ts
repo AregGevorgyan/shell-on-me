@@ -51,14 +51,8 @@ import { DisplayUser, FullUser } from './user-types'
 
 import { ContractMetric } from 'common/contract-metric'
 import {
-  CheckoutSession,
   GIDXDocument,
   GPSProps,
-  PaymentDetail,
-  PendingCashoutStatusData,
-  cashoutParams,
-  cashoutRequestParams,
-  checkoutParams,
   verificationParams,
 } from 'common/gidx/gidx'
 import { Notification } from 'common/notification'
@@ -433,29 +427,6 @@ export const API = (_apiTypeCheck = {
         limit: z.coerce.number().min(1).max(100).default(50),
         token: z.enum(['MANA', 'CASH']).default('MANA'),
         kind: z.enum(['creator', 'profit', 'loss', 'volume', 'referral']),
-      })
-      .strict(),
-  },
-  'verify-phone-number': {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as { status: string },
-    props: z
-      .object({
-        phoneNumber: z.string(),
-        code: z.string(),
-      })
-      .strict(),
-  },
-  'request-otp': {
-    method: 'GET',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as { status: string },
-    props: z
-      .object({
-        phoneNumber: z.string(),
       })
       .strict(),
   },
@@ -1030,18 +1001,6 @@ export const API = (_apiTypeCheck = {
         to: z.string(),
       })
       .strict(),
-  },
-  'convert-sp-to-mana': {
-    method: 'POST',
-    visibility: 'public',
-    authed: true,
-    props: z.object({ amount: z.number().positive().finite().safe() }).strict(),
-  },
-  'convert-cash-to-mana': {
-    method: 'POST',
-    visibility: 'public',
-    authed: true,
-    props: z.object({ amount: z.number().positive().finite().safe() }).strict(),
   },
   'request-loan': {
     method: 'POST',
@@ -1976,58 +1935,6 @@ export const API = (_apiTypeCheck = {
       DeviceGPS: GPSProps,
     }),
   },
-  'get-checkout-session-gidx': {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as {
-      status: string
-      message?: string
-      session?: CheckoutSession
-    },
-    props: z.object({
-      PayActionCode: z.enum(['PAY', 'PAYOUT']).default('PAY'),
-      DeviceGPS: GPSProps,
-      userId: z.string().optional(),
-      ip: z.string().optional(),
-    }),
-  },
-  'complete-checkout-session-gidx': {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as {
-      status: string
-      message?: string
-      gidxMessage?: string | null
-      details?: PaymentDetail[]
-    },
-    props: z.object(checkoutParams),
-  },
-  'complete-cashout-session-gidx': {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as {
-      status: string
-      message?: string
-      gidxMessage?: string | null
-      details?: PaymentDetail[]
-    },
-    props: z.object(cashoutParams),
-  },
-  'complete-cashout-request': {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as {
-      status: string
-      message?: string
-      gidxMessage?: string | null
-      details?: PaymentDetail[]
-    },
-    props: z.object(cashoutRequestParams),
-  },
   'get-verification-documents-gidx': {
     method: 'POST',
     visibility: 'undocumented',
@@ -2063,19 +1970,6 @@ export const API = (_apiTypeCheck = {
       ignoreContractIds: z.array(z.string()).optional(),
       justLikes: z.coerce.number().optional(),
     }),
-  },
-  'get-cashouts': {
-    method: 'GET',
-    visibility: 'undocumented',
-    authed: true,
-    returns: [] as PendingCashoutStatusData[],
-    props: z
-      .object({
-        limit: z.coerce.number().gte(0).lte(100).default(10),
-        offset: z.coerce.number().gte(0).default(0),
-        userId: z.string().optional(),
-      })
-      .strict(),
   },
   txns: {
     method: 'GET',
@@ -2551,15 +2445,6 @@ export const API = (_apiTypeCheck = {
       })
       .strict(),
   },
-  validateIap: {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as { success: boolean },
-    props: z.object({
-      receipt: z.string(),
-    }),
-  },
   'check-sports-event': {
     method: 'GET',
     visibility: 'public',
@@ -2619,7 +2504,7 @@ export const API = (_apiTypeCheck = {
         contractId: z.string().optional(),
         postId: z.string().optional(),
         startTime: z.number().positive().finite().safe(),
-        method: z.enum(['mana', 'cash', 'admin-free']),
+        method: z.enum(['mana', 'admin-free']),
       })
       .strict()
       .refine(
@@ -2630,7 +2515,7 @@ export const API = (_apiTypeCheck = {
           message: 'Either contractId or postId must be provided, but not both',
         }
       ),
-    returns: {} as { success: boolean; checkoutUrl?: string },
+    returns: {} as { success: boolean },
   },
   'generate-ai-numeric-ranges': {
     method: 'POST',

@@ -2,18 +2,15 @@ import { XIcon } from '@heroicons/react/solid'
 import clsx from 'clsx'
 import {
   MANA_MIN_BET,
-  PHONE_VERIFICATION_BONUS,
   SWEEPS_MIN_BET,
 } from 'common/economy'
 import { ENV_CONFIG } from 'common/envs/constants'
-import { humanish, User } from 'common/user'
+import { User } from 'common/user'
 import {
-  formatMoney,
   formatWithToken,
   InputTokenType,
 } from 'common/util/format'
 import { ReactNode, useEffect, useState } from 'react'
-import { VerifyPhoneModal } from 'web/components/user/verify-phone-number-banner'
 import { useUser } from 'web/hooks/use-user'
 import { ManaCoin } from 'web/public/custom-components/manaCoin'
 import { SpiceCoin } from 'web/public/custom-components/spiceCoin'
@@ -197,8 +194,7 @@ export function BuyAmountInput(props: {
       ((token === 'M$' &&
         (user.balance < (amount ?? 0) || user.balance < MANA_MIN_BET)) ||
         (token === 'CASH' &&
-          (user.cashBalance < (amount ?? 0) ||
-            user.cashBalance < SWEEPS_MIN_BET)))
+          (0 < (amount ?? 0) || 0 < SWEEPS_MIN_BET)))
     ) {
       setError('Insufficient balance')
     } else if (amount !== undefined) {
@@ -229,7 +225,7 @@ export function BuyAmountInput(props: {
   const hasLotsOfMoney =
     token === 'CASH'
       ? !!portfolio &&
-        portfolio.cashBalance + portfolio.cashInvestmentValue > 10000
+        0 + ((portfolio as any).cashInvestmentValue ?? 0) > 10000
       : !!portfolio && portfolio.balance + portfolio.investmentValue > 10000
 
   const amountWithDefault = amount ?? 0
@@ -330,7 +326,7 @@ export function BuyAmountInput(props: {
 const BuyMoreFunds = (props: { user: User | null | undefined }) => {
   const { user } = props
   const [addFundsModalOpen, setAddFundsModalOpen] = useState(false)
-  const [showVerifyPhone, setShowVerifyPhone] = useState(false)
+  void user
   return (
     <>
       Not enough funds.
@@ -340,15 +336,6 @@ const BuyMoreFunds = (props: { user: User | null | undefined }) => {
       >
         Buy more?
       </button>
-      {user && !humanish(user) && (
-        <button
-          className="text-primary-500 hover:decoration-primary-400 ml-1 hover:underline"
-          onClick={() => setShowVerifyPhone(true)}
-        >
-          Verify your phone number for {formatMoney(PHONE_VERIFICATION_BONUS)}
-        </button>
-      )}
-      <VerifyPhoneModal open={showVerifyPhone} setOpen={setShowVerifyPhone} />
       <AddFundsModal open={addFundsModalOpen} setOpen={setAddFundsModalOpen} />
     </>
   )

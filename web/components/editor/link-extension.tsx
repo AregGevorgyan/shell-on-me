@@ -1,5 +1,6 @@
 import { mergeAttributes } from '@tiptap/core'
 import { Link as TiptapLink } from '@tiptap/extension-link'
+import { DOMAIN } from 'common/envs/constants'
 import NextLink from 'next/link'
 import { ReactNode } from 'react'
 import { linkClass } from 'web/components/widgets/site-link'
@@ -49,5 +50,5 @@ export const DisplayLink = TiptapLink.extend({
 const isInternal = (href: string) =>
   href.startsWith('/') ||
   href.startsWith('#') ||
-  href.includes('manifold.markets') ||
+  href.includes(DOMAIN) ||
   href.includes('localhost')

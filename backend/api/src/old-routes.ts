@@ -3,7 +3,6 @@ import { health } from './health'
 import { claimmanalink } from './claim-manalink'
 import { creategroup } from './create-group'
 import { unsubscribe } from './unsubscribe'
-import { stripewebhook, createcheckoutsession } from './stripe-endpoints'
 import { markallnotifications } from './mark-all-notifications'
 import { updatememberrole } from './update-group-member-role'
 import { updategroupprivacy } from './update-group-privacy'
@@ -21,7 +20,6 @@ import { updategroup } from './update-group'
 import { updateUserDisinterestEmbedding } from 'api/update-user-disinterests'
 import { cancelbounty } from './cancel-bounty'
 import { searchgiphy } from './search-giphy'
-import { manachantweet } from './manachan-tweet'
 import { getsimilargroupstocontract } from 'api/get-similar-groups-to-contract'
 import { followUser } from './follow-user'
 import { report } from './report'
@@ -79,23 +77,11 @@ export const addOldRoutes = (app: express.Application) => {
   app.post('/boost-market', ...apiRoute(boostmarket))
   app.post('/redeem-boost', ...apiRoute(redeemboost))
 
-  app.post(
-    '/createcheckoutsession',
-    allowCorsUnrestricted,
-    createcheckoutsession
-  )
-  app.post(
-    '/stripewebhook',
-    allowCorsUnrestricted,
-    express.raw({ type: '*/*' }),
-    stripewebhook
-  )
   app.post('/follow-topic', ...apiRoute(followtopic))
   app.post('/league-activity', ...apiRoute(leagueActivity))
   app.post('/cancel-bounty', ...apiRoute(cancelbounty))
   app.post('/edit-answer-cpmm', ...apiRoute(editanswercpmm))
   app.post('/searchgiphy', ...apiRoute(searchgiphy))
-  app.post('/manachantweet', ...apiRoute(manachantweet))
   app.post(
     '/get-similar-groups-to-contract',
     ...apiRoute(getsimilargroupstocontract)

@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router'
+import { DOMAIN } from 'common/envs/constants'
 import { usePersistentLocalState } from 'web/hooks/use-persistent-local-state'
 import { useUser } from 'web/hooks/use-user'
 import { Button } from './buttons/button'
@@ -18,6 +19,8 @@ export function UpdatedTermsModal() {
   const isExceptionPage = ['/terms', '/privacy', '/sweepstakes-rules'].some(
     (path) => actualPath.includes(path)
   )
+  const docsBaseUrl =
+    process.env.NEXT_PUBLIC_DOCS_BASE_URL ?? `https://${DOMAIN}`
 
   // Add a constant for the cutoff date, UPDATE WHEN FLIP TWOMBA_SWITCH
   const TERMS_UPDATE_DATE = new Date('2024-09-17') // Replace with actual update date
@@ -38,7 +41,7 @@ export function UpdatedTermsModal() {
         <p className="text-ink-700">
           As part of our launch of sweepstakes, we have updated our{' '}
           <a
-            href="https://docs.manifold.markets/terms-and-conditions"
+            href={`${docsBaseUrl}/terms-and-conditions`}
             className="text-primary-700 font-semibold underline"
             target="_blank"
           >
@@ -46,7 +49,7 @@ export function UpdatedTermsModal() {
           </a>
           ,{' '}
           <a
-            href="https://docs.manifold.markets/privacy-policy"
+            href={`${docsBaseUrl}/privacy-policy`}
             className="text-primary-700 font-semibold underline"
             target="_blank"
           >
@@ -54,7 +57,7 @@ export function UpdatedTermsModal() {
           </a>
           , and{' '}
           <a
-            href="https://docs.manifold.markets/rules"
+            href={`${docsBaseUrl}/rules`}
             className="text-primary-700 font-semibold underline"
             target="_blank"
           >

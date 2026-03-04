@@ -3,6 +3,7 @@ import { log } from 'shared/utils'
 import { getNotificationDestinationsForUser } from 'common/user-notification-preferences'
 import { PrivateUser } from 'common/user'
 import { MarketMovementData, Notification } from 'common/notification'
+import { DOMAIN } from 'common/envs/constants'
 import {
   getMarketMovementEmail,
   MarketMovementEmailData,
@@ -100,7 +101,7 @@ export async function sendUnseenMarketMovementNotifications() {
 
           return {
             questionTitle: question!,
-            questionUrl: `https://manifold.markets/${creatorUsername}/${slug}`,
+            questionUrl: `https://${DOMAIN}/${creatorUsername}/${slug}`,
             prob: `${Math.round(endProb * 100)}%`,
             probChangeStyle: endProb > startProb ? greenBg : redBg,
             startProb,

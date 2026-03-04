@@ -1,4 +1,5 @@
 import { interpolateColor } from 'common/util/color'
+import { DOMAIN } from 'common/envs/constants'
 import {
   DEM_DARK_HEX,
   DEM_LIGHT_HEX,
@@ -200,7 +201,7 @@ export function ProbabilityNeedle(props: {
         opacity={0.3}
         fontWeight={'semibold'}
       >
-        Source: manifold.markets
+        {`Source: ${DOMAIN}`}
       </text>
     </svg>
   )

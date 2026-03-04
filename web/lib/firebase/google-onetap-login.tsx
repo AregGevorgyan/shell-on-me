@@ -4,12 +4,18 @@ import Script from 'next/script'
 import { useEffect } from 'react'
 import { useUser } from 'web/hooks/use-user'
 import { auth } from './users'
+const STARTUPSHELL_EMAIL_DOMAIN = '@startupshell.org'
 
 async function handleResponse(response: any) {
   const idToken = response.credential
   const credential = GoogleAuthProvider.credential(idToken)
   try {
     const result = await signInWithCredential(auth, credential)
+    const email = result.user.email?.toLowerCase()
+    if (!email?.endsWith(STARTUPSHELL_EMAIL_DOMAIN)) {
+      await auth.signOut()
+      throw new Error('Sign in with your @startupshell.org Google account.')
+    }
     console.log(result.user)
   } catch (error) {
     console.error('could not log in via onetap', error)

@@ -176,8 +176,10 @@ export const PortfolioValueSection = memo(
       )
     }
 
-    const { balance, investmentValue, cashBalance, cashInvestmentValue } =
-      lastPortfolioMetrics
+    const portfolioAny = lastPortfolioMetrics as any
+    const { balance, investmentValue } = lastPortfolioMetrics
+    const cashBalance = portfolioAny.cashBalance ?? 0
+    const cashInvestmentValue = portfolioAny.cashInvestmentValue ?? 0
 
     const first = portfolioHistory?.[0]
 
@@ -186,7 +188,8 @@ export const PortfolioValueSection = memo(
         ? {
             balance:
               first.balance +
-              (first.spiceBalance ?? 0) * SPICE_TO_MANA_CONVERSION_RATE,
+              ((first as any).spiceBalance ?? 0) *
+                SPICE_TO_MANA_CONVERSION_RATE,
             investmentValue: first.investmentValue,
             totalDeposits: first.totalDeposits,
           }
@@ -194,7 +197,7 @@ export const PortfolioValueSection = memo(
       last: {
         balance:
           lastPortfolioMetrics.balance +
-          (lastPortfolioMetrics.spiceBalance ?? 0) *
+          (portfolioAny.spiceBalance ?? 0) *
             SPICE_TO_MANA_CONVERSION_RATE,
         investmentValue: lastPortfolioMetrics.investmentValue,
         totalDeposits: lastPortfolioMetrics.totalDeposits,
@@ -208,15 +211,15 @@ export const PortfolioValueSection = memo(
     } = getPortfolioValues({
       first: first
         ? {
-            balance: first.cashBalance,
-            investmentValue: first.cashInvestmentValue,
-            totalDeposits: first.totalCashDeposits,
+            balance: (first as any).cashBalance ?? 0,
+            investmentValue: (first as any).cashInvestmentValue ?? 0,
+            totalDeposits: (first as any).totalCashDeposits ?? 0,
           }
         : undefined,
       last: {
-        balance: lastPortfolioMetrics.cashBalance,
-        investmentValue: lastPortfolioMetrics.cashInvestmentValue,
-        totalDeposits: lastPortfolioMetrics.totalCashDeposits,
+        balance: cashBalance,
+        investmentValue: cashInvestmentValue,
+        totalDeposits: portfolioAny.totalCashDeposits ?? 0,
       },
     })
 

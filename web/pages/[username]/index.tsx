@@ -1,5 +1,4 @@
 import {
-  CashIcon,
   ChatAlt2Icon,
   ChevronDownIcon,
   PresentationChartLineIcon,
@@ -43,12 +42,10 @@ import { BalanceChangeTable } from 'web/components/portfolio/balance-change-tabl
 import { PortfolioSummary } from 'web/components/portfolio/portfolio-summary'
 import { PortfolioValueSection } from 'web/components/portfolio/portfolio-value-section'
 import { BlockedUser } from 'web/components/profile/blocked-user'
-import { RedeemSweepsButtons } from 'web/components/profile/redeem-sweeps-buttons'
 import { UserContractsList } from 'web/components/profile/user-contracts-list'
 import { UserLikedContractsButton } from 'web/components/profile/user-liked-contracts-button'
 import { SEO } from 'web/components/SEO'
 import { UserHandles } from 'web/components/user/user-handles'
-import { VerifyPhoneNumberBanner } from 'web/components/user/verify-phone-number-banner'
 import { Avatar } from 'web/components/widgets/avatar'
 import { FullscreenConfetti } from 'web/components/widgets/fullscreen-confetti'
 import ImageWithBlurredShadow from 'web/components/widgets/image-with-blurred-shadow'
@@ -71,7 +68,6 @@ import { db } from 'web/lib/supabase/db'
 import { api } from 'web/lib/api/api'
 import { getAverageUserRating, getUserRating } from 'web/lib/supabase/reviews'
 import Custom404 from 'web/pages/404'
-import { UserPayments } from 'web/pages/payments'
 
 export const getStaticProps = async (props: {
   params: {
@@ -367,14 +363,6 @@ function UserProfile(props: {
           </Col>
         )}
 
-        {isCurrentUser && (
-          <RedeemSweepsButtons
-            user={user}
-            className="m-2 w-48"
-            redeemableCash={user.cashBalance}
-          />
-        )}
-
         <Col className="mx-4">
           <QueryUncontrolledTabs
             trackingName={'profile tabs'}
@@ -390,9 +378,6 @@ function UserProfile(props: {
                 stackedTabIcon: <PresentationChartLineIcon className="h-5" />,
                 content: (
                   <>
-                    <Col className="mt-2 gap-2">
-                      <VerifyPhoneNumberBanner user={currentUser} />
-                    </Col>
                     <PortfolioSummary className="mt-4" user={user} />
                   </>
                 ),
@@ -466,16 +451,6 @@ function UserProfile(props: {
                   </Col>
                 ),
               },
-              {
-                title: 'Payments',
-                stackedTabIcon: <CashIcon className="h-5" />,
-                content: (
-                  <>
-                    <Spacer h={4} />
-                    <UserPayments userId={user.id} />
-                  </>
-                ),
-              }
             )}
           />
         </Col>

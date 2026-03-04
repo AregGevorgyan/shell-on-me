@@ -2,11 +2,9 @@ import {
   DEV_HOUSE_LIQUIDITY_PROVIDER_ID,
   HOUSE_LIQUIDITY_PROVIDER_ID,
 } from 'common/antes'
-import { Contract, contractUrl } from 'common/contract'
+import { Contract } from 'common/contract'
 import {
   BOOST_COST_MANA,
-  DEV_BOOST_STRIPE_PRICE_ID,
-  PROD_BOOST_STRIPE_PRICE_ID,
 } from 'common/economy'
 import { isAdminId, isModId } from 'common/envs/constants'
 import { Row } from 'common/supabase/utils'
@@ -22,16 +20,10 @@ import {
 import { getPost } from 'shared/supabase/posts'
 import { runTxnInBetQueue, TxnData } from 'shared/txn/run-txn'
 import { getContract, isProd } from 'shared/utils'
-import Stripe from 'stripe'
 import { APIError, APIHandler } from './helpers/endpoint'
 import { onlyUsersWhoCanPerformAction } from './helpers/rate-limit'
 
 const MAX_ACTIVE_BOOSTS = 5
-
-const initStripe = () => {
-  const apiKey = process.env.STRIPE_APIKEY as string
-  return new Stripe(apiKey, { apiVersion: '2020-08-27', typescript: true })
-}
 
 //TODO; we could add a 'paid' column that is default true but for those paying with USD,
 // defaults to false until the strpe webhook marks it as true
@@ -45,7 +37,6 @@ export const purchaseContractBoost: APIHandler<'purchase-boost'> =
   // Validate that either contract or post exists and user can see it
   let contract: Contract | undefined = undefined
   let post: TopLevelPost | null = null
-  let contentUrl = ''
   let contentSlug = ''
 
   if (contractId) {
@@ -53,18 +44,15 @@ export const purchaseContractBoost: APIHandler<'purchase-boost'> =
     if (!contract) {
       throw new APIError(404, 'Contract not found')
     }
-    contentUrl = contractUrl(contract)
     contentSlug = contract.slug
   } else if (postId) {
     post = await getPost(pg, postId)
     if (!post) {
       throw new APIError(404, 'Post not found')
     }
-    contentUrl = `/post/${post.slug}`
     contentSlug = post.slug
   }
 
-  const fundViaCash = method === 'cash'
   const freeAdminBoost = method === 'admin-free'
 
   // Check if user is admin/mod for free boost
@@ -73,13 +61,11 @@ export const purchaseContractBoost: APIHandler<'purchase-boost'> =
   }
 
   // If paying with mana (or admin-free), block when MANA is disabled site-wide
-  if (!fundViaCash) {
-    const systemStatus = await pg.oneOrNone(
-      `select status from system_trading_status where token = 'MANA'`
-    )
-    if (!systemStatus?.status) {
-      throw new APIError(403, `Trading with MANA is currently disabled.`)
-    }
+  const systemStatus = await pg.oneOrNone(
+    `select status from system_trading_status where token = 'MANA'`
+  )
+  if (!systemStatus?.status) {
+    throw new APIError(403, `Trading with MANA is currently disabled.`)
   }
 
   // Check if there's already an active boost for the same time period
@@ -113,11 +99,11 @@ export const purchaseContractBoost: APIHandler<'purchase-boost'> =
     )
   }
 
-  if (fundViaCash) {
-    // insert the boost as unfunded and then in the stripe endpoint, query for the boost and mark it as funded
-    const boost = await pg.one(
+  // Start transaction for mana payment
+  await pg.tx(async (tx) => {
+    const boost = await tx.one(
       `insert into contract_boosts (contract_id, post_id, user_id, start_time, end_time, funded)
-       values ($1, $2, $3, millis_to_ts($4), millis_to_ts($5), false)
+       values ($1, $2, $3, millis_to_ts($4), millis_to_ts($5), true)
        returning id`,
       [
         contractId ?? null,
@@ -127,82 +113,22 @@ export const purchaseContractBoost: APIHandler<'purchase-boost'> =
         startTime + DAY_MS,
       ]
     )
-
-    // Create Stripe checkout session
-    const stripe = initStripe()
-    const priceId = isProd()
-      ? PROD_BOOST_STRIPE_PRICE_ID
-      : DEV_BOOST_STRIPE_PRICE_ID
-
-    const session = await stripe.checkout.sessions.create({
-      metadata: {
-        userId,
-        boostId: boost.id,
-        contractId: contractId ?? '',
-        postId: postId ?? '',
-      },
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      allow_promotion_codes: true,
-      success_url: contentUrl + '?boostSuccess=true',
-      cancel_url: contentUrl + '?boostSuccess=false',
-    })
-    if (!session.url) {
-      throw new APIError(500, 'Failed to create Stripe checkout session')
+    if (!freeAdminBoost) {
+      const txnData: TxnData = {
+        category: 'CONTRACT_BOOST_PURCHASE',
+        fromType: 'USER',
+        toType: 'BANK',
+        token: 'M$',
+        data: { contractId, postId, boostId: boost.id },
+        amount: BOOST_COST_MANA,
+        fromId: userId,
+        toId: isProd()
+          ? HOUSE_LIQUIDITY_PROVIDER_ID
+          : DEV_HOUSE_LIQUIDITY_PROVIDER_ID,
+      } as ContractBoostPurchaseTxn
+      await runTxnInBetQueue(tx, txnData)
     }
-
-    return {
-      result: { success: true, checkoutUrl: session.url },
-      continue: async () => {
-        trackPublicEvent(
-          auth.uid,
-          `${contractId ? 'contract' : 'post'} boost initiated`,
-          {
-            contractId,
-            postId,
-            slug: contentSlug,
-            paymentMethod: 'cash',
-          }
-        )
-      },
-    }
-  } else {
-    // Start transaction for mana payment
-    await pg.tx(async (tx) => {
-      const boost = await tx.one(
-        `insert into contract_boosts (contract_id, post_id, user_id, start_time, end_time, funded)
-       values ($1, $2, $3, millis_to_ts($4), millis_to_ts($5), true)
-       returning id`,
-        [
-          contractId ?? null,
-          postId ?? null,
-          userId,
-          startTime,
-          startTime + DAY_MS,
-        ]
-      )
-      if (!freeAdminBoost) {
-        const txnData: TxnData = {
-          category: 'CONTRACT_BOOST_PURCHASE',
-          fromType: 'USER',
-          toType: 'BANK',
-          token: 'M$',
-          data: { contractId, postId, boostId: boost.id },
-          amount: BOOST_COST_MANA,
-          fromId: userId,
-          toId: isProd()
-            ? HOUSE_LIQUIDITY_PROVIDER_ID
-            : DEV_HOUSE_LIQUIDITY_PROVIDER_ID,
-        } as ContractBoostPurchaseTxn
-        await runTxnInBetQueue(tx, txnData)
-      }
-    })
-  }
+  })
 
   return {
     result: { success: true },
@@ -217,10 +143,10 @@ export const purchaseContractBoost: APIHandler<'purchase-boost'> =
           paymentMethod: 'mana',
         }
       )
-      if (startTime <= Date.now() && !fundViaCash && contract) {
+      if (startTime <= Date.now() && contract) {
         await boostContractImmediately(pg, contract)
       }
-      if (startTime <= Date.now() && !fundViaCash && post) {
+      if (startTime <= Date.now() && post) {
         await boostPostImmediately(pg, post)
       }
     },

@@ -4,6 +4,7 @@ import { LinkPreviewProps } from 'web/components/editor/link-preview-extension'
 import { Editor } from '@tiptap/react'
 import { JSONContent } from '@tiptap/core'
 import { filterDefined } from 'common/util/array'
+import { DOMAIN } from 'common/envs/constants'
 import { api } from 'web/lib/api/api'
 
 const linkPreviewDismissed: { [key: string]: boolean } = {}
@@ -42,7 +43,7 @@ export const LinkPreviewNodeView = (props: LinkPreviewProps) => {
         className="block"
         key={id}
         href={url}
-        target={url.includes('manifold.markets') ? '_self' : '_blank'}
+        target={url.includes(DOMAIN) ? '_self' : '_blank'}
         rel="noreferrer ugc"
       >
         <img

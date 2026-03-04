@@ -31,6 +31,8 @@ import { onCreateUser } from 'shared/helpers/on-create-user'
 import { insert } from 'shared/supabase/utils'
 import { runTxnFromBank } from 'shared/txn/run-txn'
 
+const STARTUPSHELL_EMAIL_DOMAIN = '@startupshell.org'
+
 export const createUserMain = async (
   props: ValidatedAPIParams<'createuser'>,
   userId: string,
@@ -60,6 +62,12 @@ export const createUserMain = async (
 
   const fbUser = await admin.auth().getUser(userId)
   const email = fbUser.email
+  if (!email?.toLowerCase().endsWith(STARTUPSHELL_EMAIL_DOMAIN)) {
+    throw new APIError(
+      403,
+      'Access is restricted to @startupshell.org accounts.'
+    )
+  }
   const emailName = email?.replace(/@.*$/, '')
 
   if (email?.includes('ccvem')) {

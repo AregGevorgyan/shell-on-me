@@ -610,7 +610,7 @@ export const BuyPanelBody = (
     ? formatLargeNumber(probAfter)
     : formatPercent(probAfter)
 
-  const balance = isCashContract ? user?.cashBalance ?? 0 : user?.balance ?? 0
+  const balance = user?.balance ?? 0
 
   const bankrollFraction = (betAmount ?? 0) / (balance ?? 1e9)
 

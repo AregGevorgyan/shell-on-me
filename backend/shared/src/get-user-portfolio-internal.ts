@@ -37,15 +37,14 @@ export const getUserPortfolioInternal = async (userId: string) => {
     contractsById,
     metrics
   )
-  const { investmentValue, cashInvestmentValue, loanTotal } = newPortfolio
+  const { investmentValue, loanTotal } = newPortfolio
 
   const dayAgoPortfolio = first(
     await getPortfolioHistory(userId, Date.now() - DAY_MS, 1, pg)
   )
 
   const dayAgoProfit = dayAgoPortfolio
-    ? dayAgoPortfolio.spiceBalance +
-      dayAgoPortfolio.balance +
+    ? dayAgoPortfolio.balance +
       dayAgoPortfolio.investmentValue -
       dayAgoPortfolio.totalDeposits
     : 0
@@ -61,23 +60,14 @@ export const getUserPortfolioInternal = async (userId: string) => {
     answers.length
   )
 
-  const {
-    totalDeposits,
-    spiceBalance,
-    balance,
-    cashBalance,
-    totalCashDeposits,
-  } = user
+  const totalDeposits = user.totalDeposits
+  const balance = user.balance
   return {
     userId,
     loanTotal,
     investmentValue,
-    cashInvestmentValue,
     balance,
-    cashBalance,
-    spiceBalance,
     totalDeposits,
-    totalCashDeposits,
     dailyProfit: investmentValue + balance - totalDeposits - dayAgoProfit,
     timestamp: Date.now(),
   } as LivePortfolioMetrics

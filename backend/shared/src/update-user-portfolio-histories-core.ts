@@ -171,16 +171,19 @@ export async function updateUserPortfolioHistoriesCore(userIds?: string[]) {
         totalDeposits,
     }
 
+    const currentPortfolioAny = currentPortfolio as any
+    const newPortfolioAny = newPortfolio as any
     const didPortfolioChange =
       currentPortfolio === undefined ||
       currentPortfolio.balance !== newPortfolio.balance ||
-      currentPortfolio.cashBalance !== newPortfolio.cashBalance ||
-      currentPortfolio.spiceBalance !== newPortfolio.spiceBalance ||
+      currentPortfolioAny.cashBalance !== newPortfolioAny.cashBalance ||
+      currentPortfolioAny.spiceBalance !== newPortfolioAny.spiceBalance ||
       currentPortfolio.totalDeposits !== newPortfolio.totalDeposits ||
-      currentPortfolio.totalCashDeposits !== newPortfolio.totalCashDeposits ||
+      currentPortfolioAny.totalCashDeposits !==
+        newPortfolioAny.totalCashDeposits ||
       currentPortfolio.investmentValue !== newPortfolio.investmentValue ||
-      currentPortfolio.cashInvestmentValue !==
-        newPortfolio.cashInvestmentValue ||
+      currentPortfolioAny.cashInvestmentValue !==
+        newPortfolioAny.cashInvestmentValue ||
       currentPortfolio.loanTotal !== newPortfolio.loanTotal ||
       currentPortfolio.profit !== newPortfolio.profit
 
@@ -189,12 +192,12 @@ export async function updateUserPortfolioHistoriesCore(userIds?: string[]) {
         user_id: user.id,
         ts: new Date(newPortfolio.timestamp).toISOString(),
         investment_value: newPortfolio.investmentValue,
-        cash_investment_value: newPortfolio.cashInvestmentValue,
+        cash_investment_value: newPortfolioAny.cashInvestmentValue ?? 0,
         balance: newPortfolio.balance,
-        spice_balance: newPortfolio.spiceBalance,
-        cash_balance: newPortfolio.cashBalance,
+        spice_balance: newPortfolioAny.spiceBalance ?? 0,
+        cash_balance: newPortfolioAny.cashBalance ?? 0,
         total_deposits: newPortfolio.totalDeposits,
-        total_cash_deposits: newPortfolio.totalCashDeposits,
+        total_cash_deposits: newPortfolioAny.totalCashDeposits ?? 0,
         loan_total: newPortfolio.loanTotal,
         profit: newPortfolio.profit,
       })
@@ -399,11 +402,6 @@ export const calculateNewPortfolioMetricsWithContractMetrics = (
   contractsById: { [k: string]: Contract },
   contractMetrics: ContractMetric[]
 ) => {
-  const cashPayouts = getUnresolvedStatsForToken(
-    'CASH',
-    contractMetrics,
-    contractsById
-  ).value
   const manaPayouts = getUnresolvedStatsForToken(
     'MANA',
     contractMetrics,
@@ -413,12 +411,8 @@ export const calculateNewPortfolioMetricsWithContractMetrics = (
   const loanTotal = sumBy(contractMetrics, (cm) => (cm.loan ?? 0) + (cm.marginLoan ?? 0))
   return {
     investmentValue: manaPayouts,
-    cashInvestmentValue: cashPayouts,
     balance: user.balance,
-    cashBalance: user.cashBalance,
-    spiceBalance: user.spiceBalance,
     totalDeposits: user.totalDeposits,
-    totalCashDeposits: user.totalCashDeposits,
     loanTotal,
     timestamp: Date.now(),
     userId: user.id,

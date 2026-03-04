@@ -2,6 +2,7 @@
 import { WeeklyPortfolioUpdateOGCardProps } from 'common/weekly-portfolio-update'
 import { ProfitLossGraph } from 'web/components/og/graph'
 import { Point } from 'common/edge/og'
+import { DOMAIN } from 'common/envs/constants'
 
 // Notes for working with this:
 // - Some css elements are missing or broken (e.g. 'gap' and 'text-ellipsis' and 'line-clamp')
@@ -45,7 +46,7 @@ export function OgWeeklyUpdate(props: WeeklyPortfolioUpdateOGCardProps) {
       <div className="absolute right-24 top-8 flex">
         <img
           className="mr-3 h-12 w-12"
-          src="https:&#x2F;&#x2F;manifold.markets&#x2F;logo.svg"
+          src={`https://${DOMAIN}/logo.svg`}
           width="40"
           height="40"
         />

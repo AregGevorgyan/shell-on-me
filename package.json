@@ -4,7 +4,6 @@
   "workspaces": [
     "common",
     "backend/api",
-    "backend/discord-bot",
     "backend/scheduler",
     "backend/scripts",
     "backend/shared",

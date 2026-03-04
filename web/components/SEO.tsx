@@ -1,5 +1,6 @@
 import { removeUndefinedProps } from 'common/util/object'
 import { buildOgUrl } from 'common/util/og'
+import { DOMAIN } from 'common/envs/constants'
 import Head from 'next/head'
 
 export function SEO<
@@ -19,11 +20,11 @@ export function SEO<
     (ogProps &&
       buildOgUrl(removeUndefinedProps(ogProps.props) as any, ogProps.endpoint))
 
-  const absUrl = 'https://manifold.markets' + url
+  const absUrl = `https://${DOMAIN}` + url
 
   return (
     <Head>
-      <title>{`${title} | Manifold`}</title>
+      <title>{`${title} | StartupShell`}</title>
 
       <meta
         property="og:title"

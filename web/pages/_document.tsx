@@ -10,7 +10,7 @@ export default function Document() {
         {`@media (prefers-color-scheme: dark) {
             :root {
               color-scheme: dark;
-              background-color: rgb(15 23 41);
+              background-color: rgb(15 12 8);
               color: white;
             }
           }`}

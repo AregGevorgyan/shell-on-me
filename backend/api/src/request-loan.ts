@@ -38,6 +38,7 @@ import {
   SUPPORTER_ENTITLEMENT_IDS,
 } from 'common/supporter-config'
 import { convertEntitlement } from 'common/shop/types'
+import { DOMAIN } from 'common/envs/constants'
 
 export const requestLoan: APIHandler<'request-loan'> = async (props, auth) => {
   const { amount, contractId, answerId: _answerId } = props
@@ -84,7 +85,7 @@ export const requestLoan: APIHandler<'request-loan'> = async (props, auth) => {
   if (!canAccessMarginLoans(entitlements)) {
     throw new APIError(
       403,
-      'Margin loans require a Manifold membership. Upgrade at manifold.markets/shop'
+      `Margin loans require a membership. Upgrade at ${DOMAIN}/shop`
     )
   }
 

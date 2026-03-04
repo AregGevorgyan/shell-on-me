@@ -65,19 +65,15 @@ function PostBoostPurchaseModal(props: {
 
   const notEnoughFunds = (user.balance ?? 0) < BOOST_COST_MANA
 
-  const purchaseBoost = async (paymentMethod: 'mana' | 'cash') => {
+  const purchaseBoost = async (paymentMethod: 'mana') => {
     setLoading(paymentMethod)
     try {
-      const result = (await api('purchase-boost', {
+      const result = await api('purchase-boost', {
         postId: post.id,
         startTime,
         method: paymentMethod,
-      })) as { success: boolean; checkoutUrl?: string }
-
-      if (result.checkoutUrl) {
-        window.location.href = result.checkoutUrl
-        return
-      }
+      })
+      void result
 
       toast.success(
         'Post boosted! It will be featured on the homepage for 24 hours.'
@@ -157,18 +153,9 @@ function PostBoostPurchaseModal(props: {
               onClick={() => purchaseBoost('mana')}
               loading={loading === 'mana'}
               disabled={!!loading || notEnoughFunds}
-              className="flex-1"
+              className="w-full"
             >
               Pay {formatMoney(BOOST_COST_MANA)}
-            </Button>
-            <Button
-              color="indigo"
-              onClick={() => purchaseBoost('cash')}
-              loading={loading === 'cash'}
-              className="flex-1"
-              disabled={!!loading}
-            >
-              Pay $100
             </Button>
           </Row>
 

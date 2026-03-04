@@ -356,10 +356,12 @@ function usePortfolioPointsFromHistory(
     }
 
     portfolioHistory.forEach((p) => {
+      const portfolioPoint = p as any
       profitPoints.push({
         x: p.timestamp,
         y: getProfit(
-          p.balance + (p.spiceBalance ?? 0) * SPICE_TO_MANA_CONVERSION_RATE,
+          p.balance +
+            (portfolioPoint.spiceBalance ?? 0) * SPICE_TO_MANA_CONVERSION_RATE,
           p.investmentValue,
           p.totalDeposits,
           firstProfit
@@ -378,32 +380,39 @@ function usePortfolioPointsFromHistory(
       })
       networthPoints.push({
         x: p.timestamp,
-        y: getNetworth(p.balance, p.investmentValue, p.spiceBalance),
+        y: getNetworth(
+          p.balance,
+          p.investmentValue,
+          portfolioPoint.spiceBalance
+        ),
         obj: p,
       })
       cashProfitPoints.push({
         x: p.timestamp,
         y: getProfit(
-          p.cashBalance,
-          p.cashInvestmentValue,
-          p.totalCashDeposits,
+          portfolioPoint.cashBalance ?? 0,
+          portfolioPoint.cashInvestmentValue ?? 0,
+          portfolioPoint.totalCashDeposits ?? 0,
           firstCashProfit
         ),
         obj: p,
       })
       cashInvestmentPoints.push({
         x: p.timestamp,
-        y: p.cashInvestmentValue,
+        y: portfolioPoint.cashInvestmentValue ?? 0,
         obj: p,
       })
       cashBalancePoints.push({
         x: p.timestamp,
-        y: p.cashBalance,
+        y: portfolioPoint.cashBalance ?? 0,
         obj: p,
       })
       cashNetworthPoints.push({
         x: p.timestamp,
-        y: getNetworth(p.cashBalance, p.cashInvestmentValue),
+        y: getNetworth(
+          portfolioPoint.cashBalance ?? 0,
+          portfolioPoint.cashInvestmentValue ?? 0
+        ),
         obj: p,
       })
     })

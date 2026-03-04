@@ -1,4 +1,16 @@
-const API_DOCS_URL = 'https://docs.manifold.markets/api'
+const stripProtocol = (urlOrHost) =>
+  urlOrHost.replace(/^https?:\/\//, '').replace(/\/$/, '')
+
+const APP_DOMAIN = stripProtocol(
+  process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'startupshell.org'
+)
+const DEV_APP_DOMAIN = stripProtocol(
+  process.env.NEXT_PUBLIC_DEV_APP_DOMAIN ?? `dev.${APP_DOMAIN}`
+)
+const DOCS_BASE_URL =
+  process.env.NEXT_PUBLIC_DOCS_BASE_URL ?? `https://${APP_DOMAIN}`
+const API_DOCS_URL =
+  process.env.NEXT_PUBLIC_API_DOCS_URL ?? `${DOCS_BASE_URL}/api`
 
 /** @type {import('next').NextConfig} */
 module.exports = {
@@ -24,8 +36,8 @@ module.exports = {
   images: {
     dangerouslyAllowSVG: true,
     remotePatterns: [
-      { hostname: 'manifold.markets' },
-      { hostname: 'dev.manifold.markets' },
+      { hostname: APP_DOMAIN },
+      { hostname: DEV_APP_DOMAIN },
       { hostname: 'oaidalleapiprodscus.blob.core.windows.net' },
       { hostname: 'lh3.googleusercontent.com' },
       { hostname: 'i.imgur.com' },
@@ -102,22 +114,22 @@ module.exports = {
       },
       {
         source: '/privacy',
-        destination: 'https://docs.manifold.markets/privacy-policy',
+        destination: `${DOCS_BASE_URL}/privacy-policy`,
         permanent: true,
       },
       {
         source: '/terms',
-        destination: 'https://docs.manifold.markets/terms',
+        destination: `${DOCS_BASE_URL}/terms`,
         permanent: true,
       },
       {
         source: '/mana-only-terms',
-        destination: 'https://docs.manifold.markets/terms',
+        destination: `${DOCS_BASE_URL}/terms`,
         permanent: true,
       },
       {
         source: '/sweepstakes-rules',
-        destination: 'https://docs.manifold.markets/sweepstakes-rules',
+        destination: `${DOCS_BASE_URL}/sweepstakes-rules`,
         permanent: true,
       },
       {

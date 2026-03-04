@@ -28,8 +28,8 @@ export const managram: APIHandler<'managram'> = onlyUsersWhoCanPerformAction(
     if (!isAdminId(fromId) && amount < 10) {
       throw new APIError(403, 'Only admins can send less than 10 mana')
     }
-    if (!isAdminId(fromId) && token === 'CASH') {
-      throw new APIError(403, 'You cannot send cash.')
+    if (token === 'CASH') {
+      throw new APIError(403, 'Cash managrams are disabled.')
     }
     if (toIds.includes(fromId)) {
       throw new APIError(400, 'Cannot send mana to yourself.')
@@ -64,10 +64,9 @@ export const managram: APIHandler<'managram'> = onlyUsersWhoCanPerformAction(
         }
 
         const total = amount * toIds.length
-        const balanceField = token === 'M$' ? 'balance' : 'cashBalance'
-        const depositsField =
-          token === 'M$' ? 'totalDeposits' : 'totalCashDeposits'
-        const balance = fromUser[balanceField]
+        const balanceField = 'balance'
+        const depositsField = 'totalDeposits'
+        const balance = fromUser.balance
         if (balance < total) {
           throw new APIError(
             403,
@@ -81,16 +80,6 @@ export const managram: APIHandler<'managram'> = onlyUsersWhoCanPerformAction(
         if (toUsers.length !== toIds.length) {
           throw new APIError(404, 'Some destination users not found.')
         }
-        if (
-          token === 'CASH' &&
-          toUsers.some((toUser) => !toUser.sweepstakesVerified)
-        ) {
-          throw new APIError(
-            403,
-            'All destination users must be sweepstakes verified.'
-          )
-        }
-
         await bulkIncrementBalances(
           tx,
           buildArray(

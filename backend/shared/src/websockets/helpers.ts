@@ -14,7 +14,9 @@ export function broadcastUpdatedPrivateUser(userId: string) {
   broadcast(`private-user/${userId}`, {})
 }
 
-export function broadcastUpdatedUser(user: Partial<User> & { id: string }) {
+export function broadcastUpdatedUser(
+  user: Partial<User> & { id: string } & Record<string, unknown>
+) {
   broadcast(`user/${user.id}`, { user })
 }
 

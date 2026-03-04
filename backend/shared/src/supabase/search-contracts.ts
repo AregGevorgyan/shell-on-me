@@ -1,5 +1,5 @@
 import { Contract, isSportsContract } from 'common/contract'
-import { PROD_MANIFOLD_LOVE_GROUP_SLUG } from 'common/envs/constants'
+import { DOMAIN, PROD_MANIFOLD_LOVE_GROUP_SLUG } from 'common/envs/constants'
 import { GROUP_SCORE_PRIOR } from 'common/feed'
 import { tsToMillis } from 'common/supabase/utils'
 import { answerCostTiers, getTierIndexFromLiquidity } from 'common/tier'
@@ -212,7 +212,7 @@ export function getSearchContractSQL(
   const hideLove = sort === 'newest' && !term.length && !groupId && !creatorId
 
   const whereSql = getSearchContractWhereSQL({ ...args, hideStonks, hideLove })
-  const isUrl = term.startsWith('https://manifold.markets/')
+  const isUrl = term.startsWith(`https://${DOMAIN}/`)
   if (isUrl) {
     const slug = term.split('/').pop()
     return renderSql(

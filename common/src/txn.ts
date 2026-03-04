@@ -15,15 +15,12 @@ type AnyTxnType =
   | BettingStreakBonus
   | CancelUniqueBettorBonus
   | CharityFee
-  | ManaPurchase
   | SignupBonus
   | ContractOldResolutionPayout
   | ContractProduceSpice
   | ContractUndoProduceSpice
   | ConsumeSpice
   | ConsumeSpiceDone
-  | ConvertCash
-  | ConvertCashDone
   | QfPayment
   | QfAddPool
   | QfDividend
@@ -57,7 +54,6 @@ type AnyTxnType =
   | ManifestAirDrop
   | ExtraPurchasedMana
   | ManifoldTopUp
-  | CashBonus
   | CashOutPending
   | KycBonus
   | ProfitFee
@@ -173,50 +169,6 @@ type CharityFee = {
   }
 }
 
-type ManaPurchase = {
-  fromId: 'EXTERNAL'
-  fromType: 'BANK'
-  toType: 'USER'
-  category: 'MANA_PURCHASE'
-  data:
-    | {
-        iapTransactionId: string
-        type: 'apple'
-        // TODO: backfill this.
-        paidInCents?: number
-      }
-    | {
-        stripeTransactionId: string
-        type: 'stripe'
-        // TODO: backfill this.
-        paidInCents?: number
-      }
-    | {
-        transactionId: string
-        type: 'gidx'
-        sessionId: string
-        paidInCents: number
-      }
-}
-type CashBonus = {
-  fromId: 'EXTERNAL'
-  fromType: 'BANK'
-  toType: 'USER'
-  category: 'CASH_BONUS'
-  data:
-    | {
-        transactionId: string
-        type: 'gidx'
-        sessionId: string
-        paidInCents: number
-      }
-    | {
-        iapTransactionId: string
-        type: 'apple'
-        paidInCents: number
-      }
-}
-
 type CashOutPending = {
   fromType: 'USER'
   toType: 'BANK'
@@ -291,27 +243,6 @@ type ConsumeSpiceDone = {
   fromType: 'BANK'
   toType: 'USER'
   category: 'CONSUME_SPICE_DONE'
-  token: 'M$'
-  data: {
-    insertTime: number
-  }
-}
-
-// these come in pairs to convert cash to mana
-type ConvertCash = {
-  fromType: 'USER'
-  toType: 'BANK'
-  category: 'CONVERT_CASH'
-  token: 'CASH'
-  data: {
-    insertTime: number
-  }
-}
-
-type ConvertCashDone = {
-  fromType: 'BANK'
-  toType: 'USER'
-  category: 'CONVERT_CASH_DONE'
   token: 'M$'
   data: {
     insertTime: number
@@ -675,7 +606,6 @@ export type BettingStreakBonusTxn = Txn & BettingStreakBonus
 export type UniqueBettorBonusTxn = Txn & UniqueBettorBonus
 export type CancelUniqueBettorBonusTxn = Txn & CancelUniqueBettorBonus
 export type CharityFeeTxn = Txn & CharityFee
-export type ManaPurchaseTxn = Txn & ManaPurchase
 export type SignupBonusTxn = Txn & SignupBonus
 export type ContractOldResolutionPayoutTxn = Txn & ContractOldResolutionPayout
 export type ContractUndoOldResolutionPayoutTxn = Txn &
@@ -684,8 +614,6 @@ export type ContractProduceSpiceTxn = Txn & ContractProduceSpice
 export type ContractUndoProduceSpiceTxn = Txn & ContractUndoProduceSpice
 export type ConsumeSpiceTxn = Txn & ConsumeSpice
 export type ConsumeSpiceDoneTxn = Txn & ConsumeSpiceDone
-export type ConvertCashTxn = Txn & ConvertCash
-export type ConvertCashDoneTxn = Txn & ConvertCashDone
 export type QfTxn = Txn & QfId
 export type QfPaymentTxn = QfTxn & QfPayment
 export type QfAddPoolTxn = QfTxn & QfAddPool

@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import { DOMAIN } from 'common/envs/constants'
 import Link from 'next/link'
 import { Fragment } from 'react'
 import { useNativeInfo } from '../native-message-provider'
@@ -66,7 +67,7 @@ const isInternalHref = (href: string) => href.startsWith('/')
 export const getLinkTarget = (href: string, newTab?: boolean) => {
   if (
     href.startsWith('http') &&
-    !href.startsWith(`https://manifold`) // covers manifold.markets and manifold.love
+    !href.startsWith(`https://${DOMAIN}`)
   )
     return '_blank'
   const { isNative } = useNativeInfo()

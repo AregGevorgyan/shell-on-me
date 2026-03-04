@@ -264,10 +264,7 @@ const StackedChartTooltip = (props: { data: DateAndCategoriesToTotals }) => {
   )
 }
 
-const categoryToLabel = {
-  CASH_BONUS: 'MANA_PURCHASE_BONUS',
-  CONVERT_CASH: 'CONVERT_CASH_TO_MANA',
-}
+const categoryToLabel = {}
 
 const categoryToColor = {
   BET_FEES: '#FF5733',
@@ -277,13 +274,9 @@ const categoryToColor = {
   SIGNUP: '#30E080',
   REFERRAL: '#10A040',
   MANIFOLD_TOP_UP: '#FF3060',
-  MANA_PURCHASE: '#925cf0',
-  MANA_PURCHASE_BONUS: '#925cf0',
   MARKETS_CREATED_QUEST: '#3498DB',
   PUSH_NOTIFICATION: '#FFC300',
   CASH_OUT: '#50C000',
-  CONVERT_CASH_TO_MANA: '#7C3AED',
-  CONVERT_CASH_DONE: '#7C3AED',
   LEAGUE_PRIZE_UNDO: '#7DC5E2',
 }
 

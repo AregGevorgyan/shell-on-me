@@ -7,7 +7,11 @@ import {
   TbBrandDiscord,
   TbBrandTwitter,
 } from 'react-icons/tb'
-import { APPLE_APP_URL, GOOGLE_PLAY_APP_URL } from 'common/envs/constants'
+import {
+  APPLE_APP_URL,
+  DOMAIN,
+  GOOGLE_PLAY_APP_URL,
+} from 'common/envs/constants'
 import { MobileAppsQRCodeDialog } from './buttons/mobile-apps-qr-code-button'
 import { useState } from 'react'
 import { useIsMobile } from 'web/hooks/use-is-mobile'
@@ -18,6 +22,9 @@ export function Socials(props: { className?: string; hideTitle?: boolean }) {
   const { isNative } = getNativePlatform()
   const isMobile = useIsMobile()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const newsletterUrl =
+    process.env.NEXT_PUBLIC_NEWS_URL ?? `https://news.${DOMAIN}`
+  const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? `info@${DOMAIN}`
 
   const appCallback = isMobile
     ? { href: isIOS() ? APPLE_APP_URL : GOOGLE_PLAY_APP_URL }
@@ -50,7 +57,7 @@ export function Socials(props: { className?: string; hideTitle?: boolean }) {
         </SocialLink>
         <SocialLink
           Icon={NewspaperIcon}
-          href="https://news.manifold.markets"
+          href={newsletterUrl}
           target="_blank"
         >
           Newsletter
@@ -64,7 +71,7 @@ export function Socials(props: { className?: string; hideTitle?: boolean }) {
         </SocialLink>
         <SocialLink
           Icon={MailIcon}
-          href="mailto:info@manifold.markets"
+          href={`mailto:${supportEmail}`}
           target="_blank"
         >
           Email

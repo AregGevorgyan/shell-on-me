@@ -25,7 +25,7 @@ import {
 import { copyToClipboard } from 'web/lib/util/copy'
 import { formatMoney } from 'common/util/format'
 import { REFERRAL_AMOUNT, STARTING_BALANCE } from 'common/economy'
-import { ENV_CONFIG, TRADE_TERM, TRADING_TERM } from 'common/envs/constants'
+import { DOMAIN, ENV_CONFIG, TRADE_TERM, TRADING_TERM } from 'common/envs/constants'
 import { CopyLinkRow } from 'web/components/buttons/copy-link-button'
 import { api } from 'web/lib/api/api'
 import { capitalize } from 'lodash'
@@ -460,7 +460,8 @@ function SetUpBot(props: {
         )}
         <div>
           Need help? Contact SirSalty#5770 in Discord or email
-          david@manifold.markets
+          {' '}
+          {`info@${DOMAIN}`}
         </div>
         {user && (
           <Col className="mb-8 p-4">
@@ -471,7 +472,7 @@ function SetUpBot(props: {
             </div>
 
             <CopyLinkRow
-              url={'https://manifold.markets/twitch?referrer=' + user?.username}
+              url={`https://${DOMAIN}/twitch?referrer=${user?.username ?? ''}`}
               eventTrackingName="copy twitch link"
             />
           </Col>

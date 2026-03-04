@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import { Contract, CreateableOutcomeType } from 'common/contract'
 import { MarketDraft } from 'common/drafts'
 import { getAnte } from 'common/economy'
+import { DOMAIN } from 'common/envs/constants'
 import { User } from 'common/user'
 import { formatMoney } from 'common/util/format'
 import { richTextToString } from 'common/util/parse'
@@ -1434,10 +1435,10 @@ export function NewContractPanel(props: {
 
         {/* Footer */}
         <div className="text-ink-500 mt-6 flex items-center justify-center gap-3 pb-0 text-sm">
-          <span>© Manifold Markets, Inc.</span>
+          <span>© StartupShell</span>
           <span>•</span>
           <a
-            href="https://manifold.markets/terms"
+            href={`https://${DOMAIN}/terms`}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-ink-700 underline"
@@ -1446,7 +1447,7 @@ export function NewContractPanel(props: {
           </a>
           <span>•</span>
           <a
-            href="https://manifold.markets/privacy"
+            href={`https://${DOMAIN}/privacy`}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-ink-700 underline"

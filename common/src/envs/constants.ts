@@ -11,7 +11,7 @@ export const CONFIGS: { [env: string]: EnvConfig } = {
   DEV: DEV_CONFIG,
 }
 
-export const TWOMBA_CASHOUT_ENABLED = true
+export const TWOMBA_CASHOUT_ENABLED = false
 export const SWEEP_PRODUCTION_ENABLED = false
 export const SPICE_PRODUCTION_ENABLED = false
 export const SPICE_TO_MANA_CONVERSION_RATE = 1
@@ -66,7 +66,9 @@ export const CORS_ORIGIN_CHARITY = new RegExp(
 
 // Vercel deployments, used for testing.
 export const CORS_ORIGIN_VERCEL = new RegExp(
-  '^https?://[a-zA-Z0-9\\-]+' + escapeRegExp('mantic.vercel.app') + '$'
+  '^https?://[a-zA-Z0-9\\-]+' +
+    escapeRegExp(process.env.NEXT_PUBLIC_VERCEL_DOMAIN ?? 'vercel.app') +
+    '$'
 )
 // Any localhost server on any port
 export const CORS_ORIGIN_LOCALHOST = /^http:\/\/localhost:\d+$/
@@ -434,9 +436,9 @@ export function supabaseConsoleTxnPath(txnId: string) {
 }
 
 export const GOOGLE_PLAY_APP_URL =
-  'https://play.google.com/store/apps/details?id=com.markets.manifold'
+  process.env.NEXT_PUBLIC_GOOGLE_PLAY_APP_URL ?? ''
 export const APPLE_APP_URL =
-  'https://apps.apple.com/us/app/manifold-markets/id6444136749'
+  process.env.NEXT_PUBLIC_APPLE_APP_URL ?? ''
 
 export const TEN_YEARS_SECS = 60 * 60 * 24 * 365 * 10
 
@@ -510,9 +512,10 @@ export const GROUP_SLUGS_TO_NOT_INTRODUCE_IN_FEED = [
 
 export const EXTERNAL_REDIRECTS = ['/umami']
 
-export const DISCORD_INVITE_LINK = 'https://discord.com/invite/eHQBNBqXuh'
+export const DISCORD_INVITE_LINK =
+  process.env.NEXT_PUBLIC_DISCORD_INVITE_LINK ?? ''
 export const DISCORD_BOT_INVITE_LINK =
-  'https://discord.com/api/oauth2/authorize?client_id=1074829857537663098&permissions=328565385280&scope=bot%20applications.commands'
+  process.env.NEXT_PUBLIC_DISCORD_BOT_INVITE_LINK ?? ''
 
 export const YES_GRAPH_COLOR = '#11b981'
 

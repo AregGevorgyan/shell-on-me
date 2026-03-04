@@ -2,24 +2,15 @@
 import clsx from 'clsx'
 import { WebPriceInDollars, PaymentAmount } from 'common/economy'
 import { ENV_CONFIG } from 'common/envs/constants'
-
-import { Txn } from 'common/txn'
-import { DAY_MS } from 'common/util/time'
-import { sum } from 'lodash'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
 import { Row } from 'web/components/layout/row'
-import { usePrivateUser, useUser } from 'web/hooks/use-user'
-import { APIError, api } from 'web/lib/api/api'
 import { Button } from './buttons/button'
 import { Modal } from './layout/modal'
 import { AmountInput } from './widgets/amount-input'
 import { Col } from './layout/col'
 import { shortenNumber } from 'common/util/formatNumber'
 import { TokenNumber } from './widgets/token-number'
-import { FundsSelector } from 'web/components/gidx/funds-selector'
 import { firebaseLogin, User } from 'web/lib/firebase/users'
-import { checkoutURL } from 'web/lib/service/stripe'
 
 const BUY_MANA_GRAPHICS = [
   '/buy-mana-graphics/10k.png',
@@ -69,21 +60,11 @@ export function AddFundsModal(props: {
 }
 
 export function BuyManaTab() {
-  const user = useUser()
-  const privateUser = usePrivateUser()
-  const [loadingPrice, setLoadingPrice] = useState<WebPriceInDollars | null>(
-    null
-  )
-
   return (
-    <Col className={'gap-2'}>
-      <FundsSelector
-        onSelectPriceInDollars={(dollarAmount) => {
-          if (!user || !privateUser) return firebaseLogin()
-          setLoadingPrice(dollarAmount)
-        }}
-        loadingPrice={loadingPrice}
-      />
+    <Col className="gap-2">
+      <div className="text-ink-1000 text-sm">
+        Real-money mana purchases are disabled for this StartupShell deployment.
+      </div>
     </Col>
   )
 }
@@ -174,76 +155,30 @@ export function PriceTile(props: {
       </div>
     </button>
   )
-  const [url, setUrl] = useState('https://manifold.markets')
-  useEffect(() => setUrl(window.location.href), [])
-  return (
-    <form
-      action={checkoutURL(user?.id || '', amounts.priceInDollars, url)}
-      method="POST"
-    >
-      {tile}
-    </form>
-  )
+  return tile
 }
 
 export const SpiceToManaForm = (props: {
   onBack: () => void
   onClose: () => void
 }) => {
-  const [amount, setAmount] = useState<number | undefined>(0)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const onSubmit = async () => {
-    if (!amount) return
-    setLoading(true)
-    try {
-      await api('convert-sp-to-mana', { amount })
-      setLoading(false)
-      setAmount(amount)
-      setError(null)
-      props.onClose()
-    } catch (e) {
-      console.error(e)
-      setError(e instanceof APIError ? e.message : 'Error converting')
-      setLoading(false)
-    }
-  }
+  void props.onClose
 
   return (
     <>
-      <div className="my-4">Convert at a rate of 1 prize point to 1 mana.</div>
-      <div className="text-ink-500 mb-2 text-sm">Amount</div>
-      <AmountInput amount={amount} onChangeAmount={setAmount} />
+      <div className="my-4">
+        Prize point conversion is disabled for this StartupShell deployment.
+      </div>
       <div className="mt-4 flex gap-2">
         <Button color="gray" onClick={props.onBack}>
           Back
         </Button>
-        <Button
-          color="gradient"
-          disabled={!amount}
-          loading={loading}
-          onClick={onSubmit}
-        >
-          Convert to {ENV_CONFIG.moneyMoniker}
-          {amount}
-        </Button>
       </div>
-      <Row className="text-error mt-2 text-sm">{error}</Row>
     </>
   )
 }
 
 export const use24hrUsdPurchasesInDollars = (userId: string) => {
-  const [purchases, setPurchases] = useState<Txn[]>([])
-
-  useEffect(() => {
-    api('txns', {
-      category: 'MANA_PURCHASE',
-      toId: userId,
-      after: Date.now() - DAY_MS,
-    }).then(setPurchases)
-  }, [userId])
-
-  return sum(purchases.map((t) => t.data?.paidInCents)) / 100
+  void userId
+  return 0
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manifold Pairs Trader</title>
+    <title>StartupShell Pairs Trader</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script
         src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
@@ -83,7 +83,7 @@
 </head>
 
 <body>
-    <h1>Manifold Pairs Trader</h1>
+    <h1>StartupShell Pairs Trader</h1>
     <input type="text" id="apiKey" placeholder="API Key" value="">
     <input type="text" id="slug1" placeholder="Market 1 Slug" value="">
     <input type="text" id="slug2" placeholder="Market 2 Slug" value="">
@@ -107,7 +107,7 @@
     <div id="betResult"></div>
 
     <script>
-        const API_URL = "https://api.manifold.markets/v0";
+        const API_URL = "/api/v0";
         let priceChart, spreadChart;
         let market1, market2;
 

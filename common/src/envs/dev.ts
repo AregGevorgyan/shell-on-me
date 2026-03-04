@@ -1,45 +1,61 @@
 import { EnvConfig, PROD_CONFIG } from './prod'
 
+const env = (key: string, fallback: string) => process.env[key] ?? fallback
+const listEnv = (key: string, fallback: string[]) => {
+  const raw = process.env[key]
+  if (!raw) return fallback
+  return raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+}
+
+const devDomain = env('NEXT_PUBLIC_DEV_APP_DOMAIN', 'dev.startupshell.org')
+const devFirebaseProjectId = env(
+  'NEXT_PUBLIC_DEV_FIREBASE_PROJECT_ID',
+  'startupshell-dev'
+)
+
 export const DEV_CONFIG: EnvConfig = {
   ...PROD_CONFIG,
-  domain: 'dev.manifold.markets',
+  domain: devDomain,
   googleAnalyticsId: '',
   firebaseConfig: {
-    apiKey: 'AIzaSyBoq3rzUa8Ekyo3ZaTnlycQYPRCA26VpOw',
-    authDomain: 'dev-mantic-markets.firebaseapp.com',
-    projectId: 'dev-mantic-markets',
-    region: 'us-central1',
-    storageBucket: 'dev-mantic-markets.appspot.com',
-    privateBucket: 'dev-mantic-markets-private',
-    messagingSenderId: '134303100058',
-    appId: '1:134303100058:web:27f9ea8b83347251f80323',
-    measurementId: 'G-YJC9E37P37',
+    apiKey: env('NEXT_PUBLIC_DEV_FIREBASE_API_KEY', ''),
+    authDomain: env(
+      'NEXT_PUBLIC_DEV_FIREBASE_AUTH_DOMAIN',
+      `${devFirebaseProjectId}.firebaseapp.com`
+    ),
+    projectId: devFirebaseProjectId,
+    region: env('NEXT_PUBLIC_DEV_FIREBASE_REGION', 'us-central1'),
+    storageBucket: env(
+      'NEXT_PUBLIC_DEV_FIREBASE_STORAGE_BUCKET',
+      `${devFirebaseProjectId}.appspot.com`
+    ),
+    privateBucket: env(
+      'NEXT_PUBLIC_DEV_FIREBASE_PRIVATE_BUCKET',
+      `${devFirebaseProjectId}-private`
+    ),
+    messagingSenderId: env('NEXT_PUBLIC_DEV_FIREBASE_MESSAGING_SENDER_ID', ''),
+    appId: env('NEXT_PUBLIC_DEV_FIREBASE_APP_ID', ''),
+    measurementId: env('NEXT_PUBLIC_DEV_FIREBASE_MEASUREMENT_ID', ''),
   },
-  cloudRunId: 'w3txbmd3ba',
-  cloudRunRegion: 'uc',
-  amplitudeApiKey: 'fd8cbfd964b9a205b8678a39faae71b3',
-  supabaseInstanceId: 'mfodonznyfxllcezufgr',
-  supabaseAnonKey:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mb2RvbnpueWZ4bGxjZXp1ZmdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Njc5ODgxNjcsImV4cCI6MTk4MzU2NDE2N30.RK8CA3G2_yccgiIFoxzweEuJ2XU5SoB7x7wBzMKitvo',
-  twitchBotEndpoint: 'https://dev-twitch-bot.manifold.markets',
-  apiEndpoint: 'api.dev.manifold.markets',
+  cloudRunId: env('NEXT_PUBLIC_DEV_CLOUD_RUN_ID', ''),
+  cloudRunRegion: env('NEXT_PUBLIC_DEV_CLOUD_RUN_REGION', 'uc'),
+  amplitudeApiKey: env('NEXT_PUBLIC_DEV_AMPLITUDE_API_KEY', ''),
+  supabaseInstanceId: env('NEXT_PUBLIC_DEV_SUPABASE_INSTANCE_ID', ''),
+  supabaseAnonKey: env('NEXT_PUBLIC_DEV_SUPABASE_ANON_KEY', ''),
+  twitchBotEndpoint: env(
+    'NEXT_PUBLIC_DEV_TWITCH_BOT_ENDPOINT',
+    `https://twitch-bot.${devDomain}`
+  ),
+  apiEndpoint: env('NEXT_PUBLIC_DEV_API_ENDPOINT', `api.${devDomain}`),
   expoConfig: {
-    iosClientId:
-      '134303100058-lioqb7auc8minvqt9iamuit2pg10pubt.apps.googleusercontent.com',
-    iosClientId2:
-      '134303100058-9464q86hhfloaij15dl9ekn6l39e3cv8.apps.googleusercontent.com',
-    expoClientId:
-      '134303100058-2uvio555s8mnhde20b4old97ptjnji3u.apps.googleusercontent.com',
-    androidClientId:
-      '134303100058-mu6dbubhks8khpqi3dq0fokqnkbputiq.apps.googleusercontent.com',
-    androidClientId2:
-      '134303100058-p29jv704pu0p8helj0pqruidi4lqss9j.apps.googleusercontent.com',
+    iosClientId: process.env.EXPO_DEV_IOS_CLIENT_ID,
+    iosClientId2: process.env.EXPO_DEV_IOS_CLIENT_ID_2,
+    expoClientId: process.env.EXPO_DEV_CLIENT_ID,
+    androidClientId: process.env.EXPO_DEV_ANDROID_CLIENT_ID,
+    androidClientId2: process.env.EXPO_DEV_ANDROID_CLIENT_ID_2,
   },
-  adminIds: [
-    'pfKxvtgSEua5DxoIfiPXxR4fAWd2',
-    '6hHpzvRG0pMq8PNJs7RZj2qlZGn2', // Ian
-    'MxyCh2xvsFMFywwjg3Az0w4xP5B3', // Dev Manifold
-    '2cO953kN1sTBpfbhPVnTjRNqLJh2', // Sinclair
-    'TabB6gJMYEUfaNWNS8i84PvMi2r2', // Genzy (Tod)
-  ],
+  adminIds: listEnv('STARTUPSHELL_DEV_ADMIN_IDS', PROD_CONFIG.adminIds),
 }

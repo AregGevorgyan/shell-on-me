@@ -14,6 +14,8 @@ import { MINUTE_MS } from 'common/util/time'
 import { METRIC_WRITER } from 'shared/monitoring/metric-writer'
 
 const PORT = (process.env.PORT ? parseInt(process.env.PORT) : null) || 8080
+const prodDomain = process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'startupshell.org'
+const devDomain = process.env.NEXT_PUBLIC_DEV_APP_DOMAIN ?? 'dev.startupshell.org'
 
 function loadTemplate(filename: string) {
   const p = path.join(__dirname, './templates', filename)
@@ -34,9 +36,7 @@ async function start() {
     basicAuth({
       users: { admin: process.env.SCHEDULER_AUTH_PASSWORD ?? '' },
       challenge: true,
-      realm: prod
-        ? 'scheduler.manifold.markets'
-        : 'scheduler.dev.manifold.markets',
+      realm: prod ? `scheduler.${prodDomain}` : `scheduler.${devDomain}`,
     })
   )
 

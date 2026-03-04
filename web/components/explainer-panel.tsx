@@ -88,7 +88,7 @@ const Accuracy = ({ onClick }: { onClick: (sectionTitle: string) => void }) => (
       <a
         className="text-primary-700 hover:underline"
         target="_blank"
-        href="https://manifold.markets/calibration"
+        href={`https://${ENV_CONFIG.domain}/calibration`}
       >
         very well calibrated
       </a>

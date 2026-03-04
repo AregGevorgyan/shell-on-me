@@ -1,4 +1,5 @@
 import { ExternalLinkIcon } from '@heroicons/react/solid'
+import { DOMAIN } from 'common/envs/constants'
 import { formatMoney } from 'common/util/format'
 import Link from 'next/link'
 import Masonry from 'react-masonry-css'
@@ -60,7 +61,7 @@ export default function LabsPage() {
         <LabCard
           title="🏆 CSPI/Salem tournament"
           description="Separate site hosting special contest"
-          href="https://salemcenter.manifold.markets/"
+          href={`https://salemcenter.${DOMAIN}/`}
           target="_blank"
         />
         <LabCard

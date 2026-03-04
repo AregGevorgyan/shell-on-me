@@ -18,27 +18,17 @@ type DateAndCategoriesToTotals = { date: string } & {
 const categoryToLabel = {
   total_value: 'total mana (-loans)',
   balance: 'mana balance',
-  spice_balance: 'spice balance',
   investment_value: 'invested',
   loan_total: 'loans',
   amm_liquidity: 'amm liquidity',
-  total_cash_value: 'total sweepcash',
-  cash_balance: 'sweepcash balance',
-  cash_investment_value: 'invested',
-  amm_cash_liquidity: 'amm liquidity',
 }
 
 const categoryToColor = {
   total_value: 'inherit',
   balance: '#925cf0',
-  spice_balance: '#FFA620',
   investment_value: '#30A0C6',
   loan_total: '#FF80B0',
   amm_liquidity: '#20D020',
-  total_cash_value: 'inherit',
-  cash_balance: '#FFD700',
-  cash_investment_value: '#30A0C6',
-  amm_cash_liquidity: '#20D020',
 }
 
 const [categories, colors] = zip(...Object.entries(categoryToColor)) as [
@@ -84,9 +74,7 @@ const StackedChart = (props: {
 
     const keys = Array.from(
       new Set(data.flatMap((d) => Object.keys(d)))
-    ).filter(
-      (key) => !['date', 'total_value', 'total_cash_value'].includes(key)
-    )
+    ).filter((key) => !['date', 'total_value'].includes(key))
 
     const stackGen = stack<{ [key: string]: number }>().keys(keys)
     const layers = stackGen(data as any)
@@ -177,19 +165,9 @@ const orderAndGroupData = (data: rowFor<'mana_supply_stats'>[]) => {
         ...pick(datum, [
           'total_value',
           'balance',
-          'spice_balance',
           'investment_value',
           'loan_total',
           'amm_liquidity',
-        ]),
-      },
-      {
-        date: datum.start_time,
-        ...pick(datum, [
-          'total_cash_value',
-          'cash_balance',
-          'cash_investment_value',
-          'amm_cash_liquidity',
         ]),
       },
     ])

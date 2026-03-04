@@ -1,9 +1,8 @@
-import { ENV_CONFIG, TRADE_TERM } from 'common/envs/constants'
+import { DOMAIN, TRADE_TERM } from 'common/envs/constants'
 import { capitalize } from 'lodash'
 import type { AppProps } from 'next/app'
-import { Figtree } from 'next/font/google'
+import { Titillium_Web } from 'next/font/google'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
 import Script from 'next/script'
 import { useEffect, useState } from 'react'
 import { AuthProvider, AuthUser } from 'web/components/auth-context'
@@ -23,8 +22,8 @@ import '../styles/globals.css'
 // See https://nextjs.org/docs/basic-features/font-optimization#google-fonts
 // and if you add a font, you must add it to tailwind config as well for it to work.
 
-const mainFont = Figtree({
-  weight: ['300', '400', '500', '600', '700'],
+const mainFont = Titillium_Web({
+  weight: ['300', '400', '600', '700'],
   variable: '--font-main',
   subsets: ['latin'],
 })
@@ -106,26 +105,9 @@ function MyApp({ Component, pageProps }: AppProps<ManifoldPageProps>) {
 
   // ian: Required by GambleId
   const devToolsOpen = false //useDevtoolsDetector()
-  const router = useRouter()
 
-  useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      ;(window as any).dataLayer?.push({
-        event: 'page_view',
-        page_path: url,
-        page_location: window.location.href,
-        page_title: document.title,
-        'gtm.start': new Date().getTime(),
-      })
-    }
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events])
-
-  const title = 'Manifold'
-  const description = `Manifold is a social prediction game. ${capitalize(
+  const title = 'StartupShell Markets'
+  const description = `StartupShell is a private social prediction game. ${capitalize(
     TRADE_TERM
   )} on news, politics, tech, & AI with play money. Or create your own prediction market.`
 
@@ -147,18 +129,18 @@ function MyApp({ Component, pageProps }: AppProps<ManifoldPageProps>) {
           content={description}
           key="description2"
         />
-        <meta property="og:url" content="https://manifold.markets" key="url" />
-        <meta property="og:site_name" content="Manifold" />
+        <meta property="og:url" content={`https://${DOMAIN}`} key="url" />
+        <meta property="og:site_name" content="StartupShell" />
         <meta name="twitter:card" content="summary" key="card" />
-        <meta name="twitter:site" content="@manifoldmarkets" />
+        <meta name="twitter:site" content="@startupshell" />
         <meta
           name="twitter:image"
-          content="https://manifold.markets/logo.png"
+          content={`https://${DOMAIN}/logo.png`}
           key="image2"
         />
         <meta
           property="og:image"
-          content="https://manifold.markets/logo-cover.png"
+          content={`https://${DOMAIN}/logo-cover.png`}
           key="image1"
         />
         <meta
@@ -169,19 +151,19 @@ function MyApp({ Component, pageProps }: AppProps<ManifoldPageProps>) {
         {/* set safari overscroll/address bar to canvas-0. TODO: change based on site theme preference */}
         <meta
           name="theme-color"
-          content="#1e293b"
+          content="#0F0C08"
           media="(prefers-color-scheme: dark)"
         />
         <meta
           name="theme-color"
-          content="#fdfeff"
+          content="#FBF5F3"
           media="(prefers-color-scheme: light)"
         />
         <link
           rel="search"
           type="application/opensearchdescription+xml"
-          href="https://manifold.markets/opensearch.xml"
-          title="Manifold"
+          href={`https://${DOMAIN}/opensearch.xml`}
+          title="StartupShell"
         />
       </Head>
       <style>
@@ -198,7 +180,7 @@ function MyApp({ Component, pageProps }: AppProps<ManifoldPageProps>) {
         <div
           className={'flex h-screen flex-col items-center justify-center p-4'}
         >
-          You cannot use developer tools with manifold. Please close them and
+          You cannot use developer tools with StartupShell. Please close them and
           refresh.
         </div>
       ) : (
@@ -221,18 +203,6 @@ function MyApp({ Component, pageProps }: AppProps<ManifoldPageProps>) {
       <Script
         src="https://analytics.umami.is/script.js"
         data-website-id="ee5d6afd-5009-405b-a69f-04e3e4e3a685"
-      />
-
-      <Script
-        id="gtm"
-        dangerouslySetInnerHTML={{
-          __html: `
-  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${ENV_CONFIG.googleAnalyticsId}');`,
-        }}
       />
     </>
   )

@@ -2,6 +2,7 @@ import {
   SupabaseDirectClient,
   createSupabaseDirectClient,
 } from 'shared/supabase/init'
+import { ManaSupply } from 'common/stats'
 import { chunk } from 'lodash'
 import { log } from 'shared/utils'
 import { DAY_MS } from 'common/util/time'
@@ -99,7 +100,7 @@ export const getManaSupplyEachDayBetweeen = async (
     const start = startDate + day * DAY_MS
     const end = start + DAY_MS
 
-    const filter = `filter (where (balance + spice_balance + investment_value > 0))`
+    const filter = `filter (where (balance + investment_value > 0))`
 
     // claude generated - takes advantage of users table being much smaller than user_portfolio_history
     // this isn't strictly the same as getManaSupply since that uses the real user balances and gets the AMM liquidity. don't backfill more than you must.
@@ -115,40 +116,18 @@ export const getManaSupplyEachDayBetweeen = async (
         ) uph on true
       )
       select
-        sum(balance) as full_mana_balance
         sum(balance) ${filter} as mana_balance,
-        sum(spice_balance) as full_spice_balance,
-        sum(spice_balance) ${filter} as spice_balance,
-        sum(cash_balance) as full_cash_balance,
-        sum(cash_balance) ${filter} as cash_balance,
-        sum(investment_value) as full_mana_investment_value,
         sum(investment_value) ${filter} as mana_investment_value,
-        sum(cash_investment_value) as cash_investment_value,
-        sum(loan_total) as full_loan_total,
         sum(loan_total) ${filter} as loan_total
       from last_history
-      where balance + spice_balance + investment_value > 0;
+      where balance + investment_value > 0;
       `,
       [end],
       (r: any) => ({
         day: millisToTs(start),
-        fullTotalManaValue:
-          r.full_mana_balance +
-          r.full_spice_balance +
-          r.full_mana_investment_value,
-        totalManaValue:
-          r.mana_balance + r.spice_balance + r.mana_investment_value,
-        totalCashValue: r.cash_balance + r.cash_investment_value,
-        fullManaBalance: r.full_mana_balance,
+        totalManaValue: r.mana_balance + r.mana_investment_value,
         manaBalance: r.mana_balance,
-        fullSpiceBalance: r.full_spice_balance,
-        spiceBalance: r.spice_balance,
-        fullCashBalance: r.full_cash_balance,
-        cashBalance: r.cash_balance,
-        fullManaInvestmentValue: r.full_mana_investment_value,
         manaInvestmentValue: r.mana_investment_value,
-        cashInvestmentValue: r.cash_investment_value,
-        fullLoanTotal: r.full_loan_total,
         loanTotal: r.loan_total,
       })
     )
@@ -159,83 +138,65 @@ export const getManaSupplyEachDayBetweeen = async (
 }
 
 export const getManaSupply = async (pg: SupabaseDirectClient) => {
-  const positiveFilter = `filter (where (u.balance + u.spice_balance + uphl.investment_value) > 0.0)`
+  const positiveFilter = `filter (where (u.balance + uphl.investment_value) > 0.0)`
 
   const userPortfolio = await pg.one(
     `select
-      sum(u.balance + u.spice_balance + uphl.investment_value) as full_total_mana_value,
-      sum(greatest(0, u.balance + u.spice_balance + uphl.investment_value)) as total_mana_value,
-      sum(u.cash_balance + uphl.cash_investment_value) as total_cash_value,
-      sum(u.balance) as full_mana_balance,
+      sum(greatest(0, u.balance + uphl.investment_value)) as total_mana_value,
       sum(u.balance) ${positiveFilter} as mana_balance,
-      sum(u.spice_balance) as full_spice_balance,
-      sum(u.spice_balance) ${positiveFilter} as spice_balance,
-      sum(u.cash_balance) as cash_balance,
-      sum(uphl.investment_value) as full_investment_value,
       sum(uphl.investment_value) ${positiveFilter} as mana_investment_value,
-      sum(uphl.cash_investment_value) as cash_investment_value,
-      sum(uphl.loan_total) as full_loan_total,
       sum(uphl.loan_total) ${positiveFilter} as loan_total
     from users u
     left join user_portfolio_history_latest uphl on u.id = uphl.user_id`,
     undefined,
     (r: any) => ({
-      fullTotalManaValue: r.full_total_mana_value,
       totalManaValue: r.total_mana_value,
-      totalCashValue: r.total_cash_value,
-      fullManaBalance: r.full_mana_balance,
       manaBalance: r.mana_balance,
-      fullSpiceBalance: r.full_spice_balance,
-      spiceBalance: r.spice_balance,
-      cashBalance: r.cash_balance,
-      fullInvestmentValue: r.full_investment_value,
       manaInvestmentValue: r.mana_investment_value,
-      cashInvestmentValue: r.cash_investment_value,
-      fullLoanTotal: r.full_loan_total,
       loanTotal: r.loan_total,
     })
   )
 
-  const liquidity = await getAMMLiquidity()
+  const ammManaLiquidity = await getAMMLiquidity()
 
-  const totalManaValue = userPortfolio.totalManaValue + liquidity.mana
-  const totalCashValue = userPortfolio.totalCashValue + liquidity.cash
+  const totalManaValue = userPortfolio.totalManaValue + ammManaLiquidity
   return {
     ...userPortfolio,
-    ammManaLiquidity: liquidity.mana,
-    ammCashLiquidity: liquidity.cash,
+    ammManaLiquidity,
     totalManaValue,
-    totalCashValue,
+  }
+}
+
+export const getPublicManaSupply = async (
+  pg: SupabaseDirectClient
+): Promise<ManaSupply> => {
+  const ms = await getManaSupply(pg)
+  return {
+    manaBalance: ms.manaBalance,
+    manaInvestmentValue: ms.manaInvestmentValue,
+    loanTotal: ms.loanTotal,
+    ammManaLiquidity: ms.ammManaLiquidity,
+    totalManaValue: ms.totalManaValue,
   }
 }
 
 const getAMMLiquidity = async () => {
   const pg = createSupabaseDirectClient()
   const [binaryLiquidity, multiLiquidity] = await Promise.all([
-    pg.many<{ sum: number; token: 'MANA' | 'CASH' }>(
+    pg.many<{ sum: number }>(
       `select
-        sum((data->>'prob')::numeric * (data->'pool'->>'YES')::numeric + (1-(data->>'prob')::numeric) *(data->'pool'->>'NO')::numeric + (data->'subsidyPool')::numeric),
-        token
+        sum((data->>'prob')::numeric * (data->'pool'->>'YES')::numeric + (1-(data->>'prob')::numeric) *(data->'pool'->>'NO')::numeric + (data->'subsidyPool')::numeric) as sum
       from contracts
-      where resolution is null and mechanism = 'cpmm-1'
-      group by token`,
+      where resolution is null and mechanism = 'cpmm-1' and token = 'MANA'`,
       []
     ),
-    pg.many<{ sum: number; token: 'MANA' | 'CASH' }>(
-      `select sum(prob * pool_yes + (1-prob) * pool_no + subsidy_pool), contracts.token
+    pg.many<{ sum: number }>(
+      `select sum(prob * pool_yes + (1-prob) * pool_no + subsidy_pool) as sum
         from answers join contracts on contract_id = contracts.id
-        where contracts.resolution is null
-        group by contracts.token`,
+        where contracts.resolution is null and contracts.token = 'MANA'`,
       []
     ),
   ])
 
-  return {
-    mana:
-      (binaryLiquidity.find((l) => l.token === 'MANA')?.sum || 0) +
-      (multiLiquidity.find((l) => l.token === 'MANA')?.sum || 0),
-    cash:
-      (binaryLiquidity.find((l) => l.token === 'CASH')?.sum || 0) +
-      (multiLiquidity.find((l) => l.token === 'CASH')?.sum || 0),
-  }
+  return (binaryLiquidity[0]?.sum || 0) + (multiLiquidity[0]?.sum || 0)
 }
