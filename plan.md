@@ -31,8 +31,7 @@ Operate this codebase as a private StartupShell prediction market using fake cur
 
 ### Remaining
 1. Final copy/branding sweep:
-- Remove remaining user-facing legacy “Mana”/“Manifold” strings in low-traffic pages, admin pages, and static/help content.
-- Decide where historical/legal references to “Manifold” should remain.
+- Remove remaining user-facing legacy “Mana”/“Manifold” strings in low-traffic pages, admin pages, and static/help content. Historical and leagal attributions to "Manifold" can remain.
 
 2. Optional schema cleanup:
 - Legacy cash/spice DB fields remain for compatibility.
