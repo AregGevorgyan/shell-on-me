@@ -66,7 +66,7 @@ export default function LinkPage(props: {
     <Page trackPageView={'manalinks page'}>
       <SEO
         title="Manalinks"
-        description="Send mana to others with a link, even if they don't have a StartupShell account yet."
+        description="Send Shell Tokens to others with a link, even if they don't have a StartupShell account yet."
         url="/links"
       />
       <Col className="mt-6 w-full px-8">
@@ -81,7 +81,7 @@ export default function LinkPage(props: {
           )}
         </Row>
         <p>
-          Manalinks can send mana ({ENV_CONFIG.moneyMoniker}) to other people,
+          Manalinks can send Shell Tokens ({ENV_CONFIG.moneyMoniker}) to other people,
           even if they don&apos;t yet have a StartupShell account. As of April
           2024 only the StartupShell team can create new manalinks.
         </p>

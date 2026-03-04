@@ -20,7 +20,7 @@ In a separate terminal, run the frontend:
 
 ```powershell
 cd web
-yarn dev:local
+bun run dev:local
 ```
 
 ## Deploy

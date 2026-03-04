@@ -5,13 +5,13 @@
   "scripts": {
     "serve": "next dev",
     "ts-watch": "tsc --watch --noEmit --incremental --preserveWatchOutput --pretty",
-    "dev": "concurrently -n NEXT,TS -c magenta,cyan \"yarn serve\" \"yarn ts-watch\"",
-    "dev:dev": "cross-env NEXT_PUBLIC_FIREBASE_ENV=DEV yarn dev",
-    "dev:prod": "cross-env NEXT_PUBLIC_FIREBASE_ENV=PROD yarn dev",
-    "dev:local": "cross-env NEXT_PUBLIC_API_URL=localhost:8088 yarn devdev",
-    "dev:remote": "cross-env NEXT_PUBLIC_API_URL=192.168.1.99:8088 yarn dev:prod",
-    "devdev": "yarn dev:dev",
-    "prod": "yarn dev:prod",
+    "dev": "concurrently -n NEXT,TS -c magenta,cyan \"bun run serve\" \"bun run ts-watch\"",
+    "dev:dev": "cross-env NEXT_PUBLIC_FIREBASE_ENV=DEV bun run dev",
+    "dev:prod": "cross-env NEXT_PUBLIC_FIREBASE_ENV=PROD bun run dev",
+    "dev:local": "cross-env NEXT_PUBLIC_API_URL=localhost:8088 bun run devdev",
+    "dev:remote": "cross-env NEXT_PUBLIC_API_URL=192.168.1.99:8088 bun run dev:prod",
+    "devdev": "bun run dev:dev",
+    "prod": "bun run dev:prod",
     "disk-space-info": "du -hs ./node_modules && du -hs ./.next && du -hs ./.next/cache",
     "clear-nextjs-cache": "rm -rf ./.next/cache",
     "build": "next build",
@@ -20,8 +20,8 @@
     "lint-fix": "eslint . --fix",
     "format": "npx prettier --write .",
     "format-changed": "cd .. && git diff $(git merge-base --fork-point main) --name-only --diff-filter=d | xargs npx prettier -w",
-    "verify": "(cd .. && yarn verify)",
-    "verify:dir": "npx prettier --check .; yarn lint; tsc --pretty --project tsconfig.json --noEmit"
+    "verify": "bun --cwd .. run verify",
+    "verify:dir": "npx prettier --check .; bun run lint; tsc --pretty --project tsconfig.json --noEmit"
   },
   "dependencies": {
     "@floating-ui/react": "0.26.28",

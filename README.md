@@ -19,14 +19,20 @@ This repo is a customized fork of Manifold, converted into a private StartupShel
 ## Requirements
 
 - Node.js 20+
-- npm 10+ (or Yarn 1.x if you prefer workspace scripts)
+- Bun 1.3+
 
 ## Install
 
 From repo root:
 
 ```bash
-npm install
+bun install
+```
+
+Copy env template:
+
+```bash
+cp .env.example .env
 ```
 
 ## Run locally
@@ -34,13 +40,13 @@ npm install
 Frontend:
 
 ```bash
-npm --prefix web run dev
+bun --cwd web run dev
 ```
 
 Backend API:
 
 ```bash
-npm --prefix backend/api run dev
+bun --cwd backend/api run dev
 ```
 
 ## Type/compile checks
@@ -48,7 +54,7 @@ npm --prefix backend/api run dev
 Backend compile:
 
 ```bash
-npm --prefix backend/api run compile
+bun --cwd backend/api run compile
 ```
 
 Web typecheck:
@@ -66,6 +72,8 @@ Primary env config lives in:
 - `common/src/envs/constants.ts`
 
 Set `NEXT_PUBLIC_APP_DOMAIN`, Firebase, and Supabase vars for your StartupShell environments.
+
+For email safety, keep `MINIMAL_EMAIL_MODE=true` and explicitly allow only essential templates/subjects.
 
 ## Design system
 

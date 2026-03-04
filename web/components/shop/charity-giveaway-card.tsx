@@ -110,7 +110,7 @@ export function CharityGiveawayCard(props: {
 
             {/* Description */}
             <p className="text-ink-600 mb-3 text-sm">
-              Support your favorite charity with mana.
+              Support your favorite charity with Shell Tokens.
             </p>
 
             {/* CTA */}

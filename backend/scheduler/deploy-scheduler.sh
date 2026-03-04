@@ -31,7 +31,7 @@ IMAGE_TAG="${TIMESTAMP}-${GIT_REVISION}"
 
 echo "Deploy start time: $(date "+%Y-%m-%d %I:%M:%S %p")"
 
-yarn build
+bun run build
 if [ "${INITIALIZE}" = false ]; then
   gcloud compute ssh ${SERVICE_NAME} \
        --project ${GCLOUD_PROJECT} \

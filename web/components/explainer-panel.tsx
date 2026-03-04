@@ -127,7 +127,7 @@ const PlayMoney = ({
     onClick={() => onClick('Why play money?')}
   >
     <div className="pb-2">
-      Mana ({ENV_CONFIG.moneyMoniker}) is the play-money currency used to bet on
+      Shell Tokens ({ENV_CONFIG.moneyMoniker}) are the play-money currency used to bet on
       Manifold. It cannot be converted to cash. All users start with{' '}
       {formatMoney(1000)} for free.
     </div>

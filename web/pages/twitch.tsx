@@ -170,7 +170,7 @@ function TwitchPlaysManifoldMarkets(props: {
           receive their profit.
         </div>
         <div>
-          Instead of Twitch channel points we use our own play money, mana (
+          Instead of Twitch channel points we use our own play money, Shell Tokens (
           {ENV_CONFIG.moneyMoniker}). All viewers start with{' '}
           {formatMoney(STARTING_BALANCE)} and can earn more for free by{' '}
           {TRADING_TERM} well.
@@ -250,7 +250,7 @@ function TwitchChatCommands() {
         <Command command="resolve no" desc="Resolves the question as 'No'." />
         <Command
           command="resolve na"
-          desc="Cancels the question and refunds everyone their mana."
+          desc="Cancels the question and refunds everyone their Shell Tokens."
         />
         <Command
           command="unfeature"

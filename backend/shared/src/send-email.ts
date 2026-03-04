@@ -2,6 +2,49 @@ import * as mailgun from 'mailgun-js'
 import { tryOrLogError } from 'shared/helpers/try-or-log-error'
 import { log } from './utils'
 
+const MINIMAL_EMAIL_MODE =
+  (process.env.MINIMAL_EMAIL_MODE ?? 'true').toLowerCase() !== 'false'
+const ESSENTIAL_TEMPLATE_ALLOWLIST = new Set(
+  (process.env.ESSENTIAL_EMAIL_TEMPLATES ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+)
+const ESSENTIAL_SUBJECT_KEYWORDS = (
+  process.env.ESSENTIAL_EMAIL_SUBJECT_KEYWORDS ??
+  'account,security,verification,password,sign-in,signin,login,otp,2fa'
+)
+  .split(',')
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean)
+
+export function shouldSendEmail(params: {
+  subject: string
+  templateId?: string
+  to: string
+}) {
+  const { subject, templateId, to } = params
+  if (!MINIMAL_EMAIL_MODE) return true
+
+  const normalizedSubject = subject.toLowerCase()
+  const subjectAllowed = ESSENTIAL_SUBJECT_KEYWORDS.some((kw) =>
+    normalizedSubject.includes(kw)
+  )
+  const templateAllowed = templateId
+    ? ESSENTIAL_TEMPLATE_ALLOWLIST.has(templateId)
+    : false
+
+  const allowed = subjectAllowed || templateAllowed
+  if (!allowed) {
+    log(
+      `Skipped non-essential email in minimal mode: to=${to}, subject="${subject}"${
+        templateId ? `, template=${templateId}` : ''
+      }`
+    )
+  }
+  return allowed
+}
+
 const initMailgun = () => {
   const apiKey = process.env.MAILGUN_KEY as string
   const domain = process.env.MAILGUN_DOMAIN ?? 'mg.startupshell.org'
@@ -14,6 +57,8 @@ export const sendTextEmail = async (
   text: string,
   options?: Partial<mailgun.messages.SendData>
 ) => {
+  if (!shouldSendEmail({ to, subject })) return null
+
   const data: mailgun.messages.SendData = {
     ...options,
     from: options?.from ?? 'StartupShell <info@startupshell.org>',
@@ -38,6 +83,8 @@ export const sendTemplateEmail = async (
   templateData: Record<string, string>,
   options?: Partial<mailgun.messages.SendTemplateData>
 ) => {
+  if (!shouldSendEmail({ to, subject, templateId })) return null
+
   const data: mailgun.messages.SendTemplateData = {
     ...options,
     from: options?.from ?? 'StartupShell <info@startupshell.org>',

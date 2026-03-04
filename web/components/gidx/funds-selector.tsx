@@ -30,12 +30,12 @@ export function FundsSelector(props: {
     <Col className="mx-auto max-w-xl">
       <Row className="mb-2 items-center gap-1 text-2xl font-semibold">
         <FaStore className="h-6 w-6" />
-        Buy mana
+        Buy Shell Tokens
       </Row>
       <div className={clsx('text-ink-700 mb-4 text-sm')}>
         <div>
           <span>
-            Buy mana to trade in your favorite questions. Not redeemable for
+            Buy Shell Tokens to trade in your favorite questions. Not redeemable for
             cash.
           </span>
           <CashoutLimitWarning user={user} className="mt-2" />

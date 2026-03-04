@@ -2,14 +2,14 @@
 
 ## Getting started
 
-To run the development server, install [Yarn 1.x][yarn], and then in this directory:
+To run the development server, install [Bun][bun], and then in this directory:
 
-1. `yarn` to install all dependencies
-2. `yarn dev:dev` starts a development web server, pointing at the development database
+1. `bun install` to install all dependencies
+2. `bun run dev:dev` starts a development web server, pointing at the development database
 3. Your site will be available on http://localhost:3000
 
-Check package.json for other command-line tasks. (e.g. `yarn dev` will point the development server at the prod
-database. `yarn emulate` will run against a local emulated database, if you are serving it via `yarn serve` from the
+Check package.json for other command-line tasks. (e.g. `bun run dev` will point the development server at the prod
+database. `bun run emulate` will run against a local emulated database, if you are serving it via `bun run serve` from the
 [`functions/` package][functions-readme].)
 
 ## Tech stack
@@ -45,7 +45,7 @@ Vercel][vercel-functions]. This is where the public Manifold HTTP API lives.
 [nextjs]: https://nextjs.org
 [vercel]: https://vercel.com
 [tailwind]: https://tailwindcss.com
-[yarn]: https://classic.yarnpkg.com/lang/en/docs/install/
+[bun]: https://bun.sh/
 [prettier]: https://prettier.io
 [prettier-integrations]: https://prettier.io/docs/en/editors.html
 [next-static-files]: https://nextjs.org/docs/basic-features/static-file-serving

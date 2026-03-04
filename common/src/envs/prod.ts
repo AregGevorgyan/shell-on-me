@@ -18,7 +18,7 @@ export type EnvConfig = {
   visibility: 'PRIVATE' | 'PUBLIC'
 
   // Branding
-  moneyMoniker: string // e.g. 'Ṁ'
+  moneyMoniker: string // e.g. 'Shell Token '
   spiceMoniker: string // e.g. 'S'
   bettor: string // e.g. 'predictor'
   nounBet: string // e.g. 'prediction'
@@ -99,7 +99,7 @@ export const PROD_CONFIG: EnvConfig = {
   adminIds: listEnv('STARTUPSHELL_ADMIN_IDS', []),
   visibility: 'PRIVATE',
 
-  moneyMoniker: 'Ṁ',
+  moneyMoniker: env('NEXT_PUBLIC_MONEY_MONIKER', 'Shell Token '),
   spiceMoniker: 'P',
   bettor: 'trader',
   verbPastBet: 'traded',

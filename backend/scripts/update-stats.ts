@@ -7,7 +7,7 @@ if (require.main === module)
   runScript(async ({ pg }) => {
     // get dates from cli
     if (process.argv.length < 4) {
-      log('Usage: yarn update-stats <start> <end>')
+      log('Usage: bun run update-stats <start> <end>')
       process.exit(1)
     }
 

@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "nodemon src/index.ts --ext '*'",
     "start": "NEXT_PUBLIC_FIREBASE_ENV=PROD nodemon src/index.ts --ext '*'",
-    "build": "tsc -b && (cd ../../common && tsc-alias) && (cd ../shared && tsc-alias) && tsc-alias && yarn dist:prepare && yarn dist:copy",
+    "build": "tsc -b && (cd ../../common && tsc-alias) && (cd ../shared && tsc-alias) && tsc-alias && bun run dist:prepare && bun run dist:copy",
     "dist:prepare": "rm -rf dist && mkdir -p dist/common/lib dist/backend/shared/lib dist/backend/scheduler/lib",
-    "dist:copy": "cp -R ../../common/lib/* dist/common/lib && cp -R ../shared/lib/* dist/backend/shared/lib && cp -R ./lib/* dist/backend/scheduler/lib && cp ../../yarn.lock dist && cp package.json dist && cp -R src/templates dist/backend/scheduler/lib",
+    "dist:copy": "cp -R ../../common/lib/* dist/common/lib && cp -R ../shared/lib/* dist/backend/shared/lib && cp -R ./lib/* dist/backend/scheduler/lib && (cp ../../bun.lock dist || true) && cp package.json dist && cp -R src/templates dist/backend/scheduler/lib",
     "prune-images": "gcloud compute ssh scheduler --command 'sudo docker image prune -af'",
     "compile": "tsc -b",
     "watch": "tsc -w",

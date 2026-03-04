@@ -48,13 +48,13 @@ export default function ClaimPage(props: {
   return (
     <Page trackPageView={'manalink slug page'}>
       <SEO
-        title="Send Mana"
-        description="Send mana to anyone via link!"
+        title="Send Shell Tokens"
+        description="Send Shell Tokens to anyone via link!"
         url="/send"
       />
       <div className="mx-auto max-w-xl px-2">
         <Row className="items-center justify-between">
-          <Title>Claim {formatMoney(link.amount)} mana </Title>
+          <Title>Claim {formatMoney(link.amount)} Shell Tokens </Title>
           <div className="my-auto"></div>
         </Row>
 

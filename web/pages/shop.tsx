@@ -317,7 +317,7 @@ export default function ShopPage() {
     <Page trackPageView="shop page" className="p-3">
       <SEO
         title="Shop"
-        description="Spend your mana on digital goods"
+        description="Spend your Shell Tokens on digital goods"
         url="/shop"
       />
       {/* Confetti on purchase */}
@@ -331,7 +331,7 @@ export default function ShopPage() {
       <Col className="mx-auto max-w-xl">
         <Row className="mb-2 items-center gap-2 text-2xl font-semibold">
           <FaGem className="h-6 w-6 text-violet-500" />
-          Mana Shop
+          Shell Token Shop
         </Row>
         {user && (
           <Row className="text-ink-700 mb-6 items-center gap-4 text-sm">
@@ -345,7 +345,7 @@ export default function ShopPage() {
               href="/checkout"
               className="text-primary-600 hover:text-primary-700 font-medium"
             >
-              Buy mana →
+              Buy Shell Tokens →
             </Link>
           </Row>
         )}
@@ -1578,7 +1578,7 @@ function ShopItemCard(props: {
                 {!canPurchase && user ? (
                   <Link href="/checkout">
                     <Button size="xs" color="gradient-pink">
-                      Buy mana
+                      Buy Shell Tokens
                     </Button>
                   </Link>
                 ) : (
@@ -1628,7 +1628,7 @@ function ShopItemCard(props: {
                   ) : !canPurchase && user ? (
                     <Link href="/checkout">
                       <Button size="sm" color="gradient-pink">
-                        Buy mana
+                        Buy Shell Tokens
                       </Button>
                     </Link>
                   ) : (
@@ -1653,7 +1653,7 @@ function ShopItemCard(props: {
                 ) : !canPurchase && user ? (
                   <Link href="/checkout" className="block">
                     <Button size="sm" color="gradient-pink" className="w-full">
-                      Buy mana
+                      Buy Shell Tokens
                     </Button>
                   </Link>
                 ) : (

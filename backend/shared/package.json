@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc -b && (cd ../../common && tsc-alias) && tsc-alias",
     "alias": "tsc-alias",
-    "verify": "yarn --cwd=../.. verify",
+    "verify": "bun --cwd ../.. run verify",
     "verify:dir": "npx eslint . --max-warnings 0"
   },
   "sideEffects": false,

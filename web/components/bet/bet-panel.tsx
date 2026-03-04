@@ -1103,7 +1103,7 @@ export const BuyPanelBody = (
                   isAdvancedTrader ? '' : 'min-w-[110px]'
                 )}
               >
-                Your mana balance
+                Your Shell Token balance
               </span>
               <span className="text-ink-600 font-semibold">
                 <MoneyDisplay

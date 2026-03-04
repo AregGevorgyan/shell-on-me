@@ -333,16 +333,17 @@ export const NOTIFICATION_DESCRIPTIONS: notification_descriptions = {
       'When another user supports a relationship between you and someone else',
   },
   airdrop: {
-    simple: 'You received a gift of mana',
-    detailed: 'Manifold has sent you a gift of mana',
+    simple: 'You received a gift of Shell Tokens',
+    detailed: 'Manifold has sent you a gift of Shell Tokens',
   },
   manifest_airdrop: {
     simple: 'You received a gift for attending Manifest',
     detailed: 'Manifold has sent you a gift for attending Manifest',
   },
   extra_purchased_mana: {
-    simple: 'You just received 9x your purchased mana in 2024',
-    detailed: 'Manifold has sent you a gift of 9x your purchased mana in 2024.',
+    simple: 'You just received 9x your purchased Shell Tokens in 2024',
+    detailed:
+      'Manifold has sent you a gift of 9x your purchased Shell Tokens in 2024.',
   },
   payment_status: {
     simple: 'Payment updates',

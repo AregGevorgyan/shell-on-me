@@ -62,8 +62,8 @@ npx concurrently \
     -c white,magenta,cyan \
     "cross-env PORT=${API_PORT} \
               NEXT_PUBLIC_FIREBASE_ENV=${NEXT_ENV} \
-              yarn --cwd=backend/api $API_COMMAND" \
+              bun --cwd backend/api run $API_COMMAND" \
     "cross-env NEXT_PUBLIC_API_URL=${LOCAL_IP}:${API_PORT} \
               NEXT_PUBLIC_FIREBASE_ENV=${NEXT_ENV} \
-              yarn --cwd=web serve" \
-    "cross-env yarn --cwd=web ts-watch"
+              bun --cwd web run serve" \
+    "cross-env bun --cwd web run ts-watch"

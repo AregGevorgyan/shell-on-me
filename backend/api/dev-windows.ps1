@@ -8,7 +8,7 @@ Write-Host "This will compile TypeScript and start the server with auto-reload."
 Write-Host ""
 Write-Host "In another terminal, run the frontend with:" -ForegroundColor Yellow
 Write-Host "  cd C:\Projects\manifold\web" -ForegroundColor White
-Write-Host "  yarn dev:local" -ForegroundColor White
+Write-Host "  bun run dev:local" -ForegroundColor White
 Write-Host ""
 
 Set-Location $PSScriptRoot

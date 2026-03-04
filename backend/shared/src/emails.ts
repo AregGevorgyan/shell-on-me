@@ -15,7 +15,7 @@ import {
   SWEEPIES_MONIKER,
 } from 'common/util/format'
 import { formatNumericProbability } from 'common/pseudo-numeric'
-import { sendTemplateEmail, sendTextEmail } from './send-email'
+import { sendTemplateEmail, sendTextEmail, shouldSendEmail } from './send-email'
 import { contractUrl, getPrivateUser, getUser, log } from 'shared/utils'
 import { getContractOGProps } from 'common/contract-seo'
 import {
@@ -123,8 +123,7 @@ export const getMarketResolutionEmail = (
     unsubscribeUrl,
   }
 
-  // Modify template here:
-  // https://app.mailgun.com/app/sending/domains/mg.manifold.markets/templates/edit/market-resolved-bulk/initial
+  // Modify template in your Mailgun dashboard.
 
   return {
     entry: [privateUser.email, templateData] as EmailAndTemplateEntry,
@@ -223,7 +222,7 @@ export const sendWelcomeEmail = async (
 
   return await sendTemplateEmail(
     privateUser.email,
-    'Welcome to Manifold!',
+    'Welcome to StartupShell!',
     'welcome',
     {
       name: firstName,
@@ -245,6 +244,11 @@ export const sendBulkEmails = async (
   recipients: EmailAndTemplateEntry[],
   from = NO_REPLY_FROM
 ) => {
+  const sampleRecipient = recipients[0]?.[0] ?? 'unknown'
+  if (!shouldSendEmail({ to: sampleRecipient, subject, templateId: template })) {
+    return
+  }
+
   // Mailgun has a limit of 1000 recipients per batch
   const emailChunks = chunk(recipients, 1000)
   for (const chunk of emailChunks) {
@@ -308,7 +312,7 @@ https://${DOMAIN}
 
   await sendTextEmail(
     privateUser.email,
-    'How are you finding Manifold?',
+    'How are you finding StartupShell?',
     emailBody,
     {
       from: `James from ${APP_NAME} <${INFO_EMAIL}>`,
@@ -361,7 +365,7 @@ export const sendUnactivatedNewUserEmail = async (
   if (!sendToEmail) return
   return await sendTemplateEmail(
     privateUser.email,
-    `Help improve Manifold + win $100 Amazon gift card`,
+    `Help improve StartupShell + win $100 Amazon gift card`,
     templateId,
     {
       name: firstName,
@@ -389,7 +393,7 @@ export const sendThankYouEmail = async (
   if (!sendToEmail) return
   return await sendTemplateEmail(
     privateUser.email,
-    'Thanks for your Manifold purchase',
+    'Thanks for your StartupShell purchase',
     'thank-you',
     {
       name: firstName,
@@ -543,7 +547,7 @@ export const sendInterestingMarketsEmail = async (
 
   await sendTemplateEmail(
     privateUser.email,
-    `${contractsToSend[0].question} & 5 more interesting markets on Manifold`,
+    `${contractsToSend[0].question} & 5 more interesting markets on StartupShell`,
     'interesting-markets',
     {
       name: firstName,
@@ -592,7 +596,7 @@ export const sendBonusWithInterestingMarketsEmail = async (
 
   await sendTemplateEmail(
     privateUser.email,
-    `Interesting questions on Manifold + ${bonusAmount} bonus mana`,
+    `Interesting questions on StartupShell + ${bonusAmount} bonus mana`,
     'signup-bonus-with-interesting-markets',
     {
       name: firstName,

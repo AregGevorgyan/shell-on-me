@@ -2181,7 +2181,7 @@ function ExtraPurchasedManaNotification(props: {
       icon={<GiftIcon className="text-primary-500 h-8 w-8" />}
       subtitle={<></>}
     >
-      Thank you for buying mana in 2024! You just received{' '}
+      Thank you for buying Shell Tokens in 2024! You just received{' '}
       <span className="font-semibold">{formatMoney(amount)}</span>, which is 9
       times what you purchased, as a gift from Manifold!
     </NotificationFrame>

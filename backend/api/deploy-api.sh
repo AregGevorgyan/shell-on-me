@@ -47,7 +47,7 @@ IMAGE_TAG="${TIMESTAMP}-${GIT_REVISION}"
 #    c. route new connections to the new instance
 #    d. delete the old instance
 
-yarn build
+bun run build
 
 if [ -z "${MANIFOLD_CLOUD_BUILD}" ]; then
     if ! command -v docker &> /dev/null

@@ -19,6 +19,12 @@ const formatterWithFraction = new Intl.NumberFormat('en-US', {
 
 export const SWEEPIES_MONIKER = '𝕊'
 
+const getMoneyPrefix = () => {
+  const moniker = ENV_CONFIG.moneyMoniker
+  // If moniker ends with an alphanumeric character, add a separating space.
+  return /[A-Za-z0-9]$/.test(moniker) ? `${moniker} ` : moniker
+}
+
 export type InputTokenType = 'M$' | 'SPICE' | 'CASH' | 'MANA'
 
 export function formatWithToken(variables: {
@@ -45,7 +51,7 @@ export function formatMoney(amount: number, token?: ContractToken) {
     return formatSweepies(amount)
   }
   const newAmount = getMoneyNumber(amount)
-  return `${ENV_CONFIG.moneyMoniker}${formatNumber(newAmount)}`
+  return `${getMoneyPrefix()}${formatNumber(newAmount)}`
 }
 
 export function formatMoneyNoMoniker(amount: number) {
@@ -91,7 +97,7 @@ export function formatSpice(amount: number) {
 
 export function formatMoneyShort(amount: number) {
   const newAmount = getMoneyNumber(amount)
-  return ENV_CONFIG.moneyMoniker + shortFormatNumber(newAmount)
+  return getMoneyPrefix() + shortFormatNumber(newAmount)
 }
 
 export function formatMoneyUSD(amount: number, fraction?: boolean) {
@@ -131,11 +137,11 @@ export function getMoneyNumberToDecimal(amount: number) {
 }
 
 export function formatMoneyWithDecimals(amount: number) {
-  return ENV_CONFIG.moneyMoniker + amount.toFixed(2)
+  return getMoneyPrefix() + amount.toFixed(2)
 }
 
 export function formatMoneyToDecimal(amount: number) {
-  return ENV_CONFIG.moneyMoniker + getMoneyNumberToDecimal(amount)
+  return getMoneyPrefix() + getMoneyNumberToDecimal(amount)
 }
 
 export function formatWithCommas(amount: number) {

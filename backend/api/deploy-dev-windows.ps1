@@ -19,22 +19,22 @@ Write-Host "`n=== Step 1: Building TypeScript ===" -ForegroundColor Yellow
 
 Set-Location $PSScriptRoot
 Write-Host "Running tsc -b..."
-yarn tsc -b
+bunx tsc -b
 if ($LASTEXITCODE -ne 0) { Write-Host "tsc -b failed" -ForegroundColor Red; exit 1 }
 
 Set-Location "$PSScriptRoot\..\..\common"
 Write-Host "Running tsc-alias in common..."
-yarn tsc-alias
+bunx tsc-alias
 if ($LASTEXITCODE -ne 0) { Write-Host "tsc-alias failed in common" -ForegroundColor Red; exit 1 }
 
 Set-Location "$PSScriptRoot\..\shared"
 Write-Host "Running tsc-alias in shared..."
-yarn tsc-alias
+bunx tsc-alias
 if ($LASTEXITCODE -ne 0) { Write-Host "tsc-alias failed in shared" -ForegroundColor Red; exit 1 }
 
 Set-Location $PSScriptRoot
 Write-Host "Running tsc-alias in api..."
-yarn tsc-alias
+bunx tsc-alias
 if ($LASTEXITCODE -ne 0) { Write-Host "tsc-alias failed in api" -ForegroundColor Red; exit 1 }
 
 # Step 2: Prepare dist folder
@@ -49,7 +49,7 @@ New-Item -ItemType Directory -Force -Path "dist\backend\api\lib" | Out-Null
 Copy-Item -Recurse -Force "..\..\common\lib\*" "dist\common\lib\"
 Copy-Item -Recurse -Force "..\shared\lib\*" "dist\backend\shared\lib\"
 Copy-Item -Recurse -Force ".\lib\*" "dist\backend\api\lib\"
-Copy-Item "..\..\yarn.lock" "dist\"
+Copy-Item "..\..\bun.lock" "dist\"
 Copy-Item "package.json" "dist\"
 
 Write-Host "dist folder prepared"
