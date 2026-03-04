@@ -15,7 +15,12 @@ import {
   SWEEPIES_MONIKER,
 } from 'common/util/format'
 import { formatNumericProbability } from 'common/pseudo-numeric'
-import { sendTemplateEmail, sendTextEmail, shouldSendEmail } from './send-email'
+import {
+  isAllowedEmailRecipient,
+  sendTemplateEmail,
+  sendTextEmail,
+  shouldSendEmail,
+} from './send-email'
 import { contractUrl, getPrivateUser, getUser, log } from 'shared/utils'
 import { getContractOGProps } from 'common/contract-seo'
 import {
@@ -244,13 +249,29 @@ export const sendBulkEmails = async (
   recipients: EmailAndTemplateEntry[],
   from = NO_REPLY_FROM
 ) => {
-  const sampleRecipient = recipients[0]?.[0] ?? 'unknown'
-  if (!shouldSendEmail({ to: sampleRecipient, subject, templateId: template })) {
+  const filteredRecipients = recipients.filter(([recipientEmail]) =>
+    shouldSendEmail({ to: recipientEmail, subject, templateId: template })
+  )
+  if (filteredRecipients.length === 0) {
+    log(
+      `Skipped bulk email ${template}; no recipients passed allowlist/essential filters.`
+    )
     return
+  }
+  if (filteredRecipients.length < recipients.length) {
+    const blockedCount = recipients.length - filteredRecipients.length
+    const sampleBlockedRecipient = recipients.find(
+      ([recipientEmail]) => !isAllowedEmailRecipient(recipientEmail)
+    )?.[0]
+    log(
+      `Filtered ${blockedCount} recipient(s) from bulk email ${template} due to allowlist or essential filters${
+        sampleBlockedRecipient ? ` (sample: ${sampleBlockedRecipient})` : ''
+      }.`
+    )
   }
 
   // Mailgun has a limit of 1000 recipients per batch
-  const emailChunks = chunk(recipients, 1000)
+  const emailChunks = chunk(filteredRecipients, 1000)
   for (const chunk of emailChunks) {
     const mailgunApiKey = process.env.MAILGUN_KEY as string
     const url = `https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`

@@ -19,6 +19,7 @@ Operate this codebase as a private StartupShell prediction market using fake cur
   - StartupShell sender/domain defaults applied.
   - Minimal email mode implemented (`MINIMAL_EMAIL_MODE=true` default).
   - Allowlist controls added (`ESSENTIAL_EMAIL_TEMPLATES`, `ESSENTIAL_EMAIL_SUBJECT_KEYWORDS`).
+  - Recipient domain allowlist enforced (`EMAIL_RECIPIENT_ALLOWLIST_DOMAINS=@startupshell.org` default), including bulk-email filtering.
 - Bun migration:
   - `yarn.lock` removed, `bun.lock` added.
   - Workspace scripts migrated to Bun.
@@ -42,7 +43,6 @@ Operate this codebase as a private StartupShell prediction market using fake cur
 - Confirm Supabase prod project, secrets, and backups.
 
 4. Email policy finalization:
-- Lock final essential email allowlist.
 - Verify essential account/security notifications still deliver.
 
 5. Ops hardening:
@@ -87,6 +87,7 @@ Set appropriately in local/dev/prod:
   - `MINIMAL_EMAIL_MODE=true`
   - optional: `ESSENTIAL_EMAIL_TEMPLATES`
   - optional: `ESSENTIAL_EMAIL_SUBJECT_KEYWORDS`
+  - `EMAIL_RECIPIENT_ALLOWLIST_DOMAINS=@startupshell.org`
   - optional: `MAILGUN_KEY`, `MAILGUN_DOMAIN`
 - Currency branding:
   - `NEXT_PUBLIC_MONEY_MONIKER=Shell Token`
@@ -131,5 +132,5 @@ npx tsc --project web/tsconfig.json --noEmit
 
 ## Immediate Next Work
 1. Run a repo-wide final copy sweep for remaining user-facing “Mana/Manifold” strings and patch safe candidates.
-2. Finalize essential email allowlist and test in staging.
+2. Test essential account/security email delivery in staging with allowlist restrictions enabled.
 3. Add a short deploy rollback section to `README.md`.

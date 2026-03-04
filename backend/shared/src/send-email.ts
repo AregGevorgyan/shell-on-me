@@ -2,6 +2,13 @@ import * as mailgun from 'mailgun-js'
 import { tryOrLogError } from 'shared/helpers/try-or-log-error'
 import { log } from './utils'
 
+const EMAIL_RECIPIENT_ALLOWLIST_DOMAINS = (
+  process.env.EMAIL_RECIPIENT_ALLOWLIST_DOMAINS ?? '@startupshell.org'
+)
+  .split(',')
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean)
+
 const MINIMAL_EMAIL_MODE =
   (process.env.MINIMAL_EMAIL_MODE ?? 'true').toLowerCase() !== 'false'
 const ESSENTIAL_TEMPLATE_ALLOWLIST = new Set(
@@ -24,6 +31,15 @@ export function shouldSendEmail(params: {
   to: string
 }) {
   const { subject, templateId, to } = params
+  if (!isAllowedEmailRecipient(to)) {
+    log(
+      `Skipped email to non-allowlisted recipient: to=${to}, allowlistedDomains=${EMAIL_RECIPIENT_ALLOWLIST_DOMAINS.join(
+        ','
+      )}`
+    )
+    return false
+  }
+
   if (!MINIMAL_EMAIL_MODE) return true
 
   const normalizedSubject = subject.toLowerCase()
@@ -43,6 +59,19 @@ export function shouldSendEmail(params: {
     )
   }
   return allowed
+}
+
+export function isAllowedEmailRecipient(to: string) {
+  const normalized = extractEmailAddress(to).toLowerCase()
+  if (!normalized) return false
+  return EMAIL_RECIPIENT_ALLOWLIST_DOMAINS.some((domainSuffix) =>
+    normalized.endsWith(domainSuffix)
+  )
+}
+
+function extractEmailAddress(input: string) {
+  const fromAngleBrackets = input.match(/<([^>]+)>/)?.[1]?.trim()
+  return fromAngleBrackets ?? input.trim()
 }
 
 const initMailgun = () => {

@@ -73,7 +73,7 @@ Primary env config lives in:
 
 Set `NEXT_PUBLIC_APP_DOMAIN`, Firebase, and Supabase vars for your StartupShell environments.
 
-For email safety, keep `MINIMAL_EMAIL_MODE=true` and explicitly allow only essential templates/subjects.
+For email safety, keep `MINIMAL_EMAIL_MODE=true`, set strict essential template/subject allowlists, and restrict recipients with `EMAIL_RECIPIENT_ALLOWLIST_DOMAINS=@startupshell.org`.
 
 ## Design system
 
