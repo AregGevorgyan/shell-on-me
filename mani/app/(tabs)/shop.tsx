@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Page from 'components/page'
 import { ThemedText } from 'components/themed-text'
-import { useUser, usePrivateUser } from 'hooks/use-user'
+import { useUser } from 'hooks/use-user'
 import {
   View,
   StyleSheet,
@@ -15,10 +15,6 @@ import { Colors } from 'constants/colors'
 import { PaymentAmount } from 'common/economy'
 import { introductoryTimeWindow, User } from 'common/user'
 import { formatMoneyUSD } from 'common/util/format'
-import {
-  getVerificationStatus,
-  PROMPT_USER_VERIFICATION_MESSAGES,
-} from 'common/gidx/user'
 import { Rounded } from 'constants/border-radius'
 import { usePrices } from 'hooks/use-prices'
 import { shortenNumber } from 'common/util/formatNumber'
@@ -33,7 +29,6 @@ import { router, useLocalSearchParams } from 'expo-router'
 
 export default function Shop() {
   const user = useUser()
-  const privateUser = usePrivateUser()
   const { priceInDollars } = useLocalSearchParams<{ priceInDollars?: string }>()
   const [loadingPrice, setLoadingPrice] = useState<PaymentAmount | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -54,8 +49,7 @@ export default function Shop() {
   const [selectedPriceFromParams, setSelectedPriceFromParams] = useState(false)
 
   useEffect(() => {
-    if (!user || !privateUser || !priceInDollars || selectedPriceFromParams)
-      return
+    if (!user || !priceInDollars || selectedPriceFromParams) return
     const priceInDollarsNumber = Number(priceInDollars)
     const matchingPrice = [...newUserPrices, ...prices].find(
       (p) => p.priceInDollars === priceInDollarsNumber
@@ -66,27 +60,19 @@ export default function Shop() {
   }, [
     priceInDollars,
     user?.id,
-    privateUser?.id,
     prices.length,
     newUserPrices.length,
   ])
 
   const onSelectPriceInDollars = (dollarAmount: PaymentAmount) => {
-    if (!user || !privateUser) return
+    if (!user) return
     setError(null)
-    const { status, message } = getVerificationStatus(user, privateUser)
-    if (status !== 'error') {
-      setCheckoutAmount(dollarAmount)
-      setLoadingPrice(dollarAmount)
-      if (Platform.OS !== 'ios') {
-        router.push(`/checkout?priceInDollars=${dollarAmount.priceInDollars}`)
-        setLoadingPrice(null)
-        setCheckoutAmount(null)
-      }
-    } else if (PROMPT_USER_VERIFICATION_MESSAGES.includes(message)) {
-      router.push(`/register?priceInDollars=${dollarAmount.priceInDollars}`)
-    } else {
-      setError(message)
+    setCheckoutAmount(dollarAmount)
+    setLoadingPrice(dollarAmount)
+    if (Platform.OS !== 'ios') {
+      router.push(`/checkout?priceInDollars=${dollarAmount.priceInDollars}`)
+      setLoadingPrice(null)
+      setCheckoutAmount(null)
     }
   }
 

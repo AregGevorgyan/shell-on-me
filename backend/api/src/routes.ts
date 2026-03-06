@@ -22,11 +22,6 @@ import { getTotalLoanAmount } from 'api/get-total-loan-amount'
 import { getTxnSummaryStats } from 'api/get-txn-summary-stats'
 import { getUniqueBetGroupCount } from 'api/get-unique-bet-groups'
 import { getUserLimitOrdersWithContracts } from 'api/get-user-limit-orders-with-contracts'
-import { getMonitorStatus } from 'api/gidx/get-monitor-status'
-import { getVerificationDocuments } from 'api/gidx/get-verification-documents'
-import { getVerificationStatus } from 'api/gidx/get-verification-status'
-import { register } from 'api/gidx/register'
-import { uploadDocument } from 'api/gidx/upload-document'
 import { getMarkets } from 'api/markets'
 import { multiSell } from 'api/multi-sell'
 import { placeMultiBet } from 'api/place-multi-bet'
@@ -364,11 +359,6 @@ export const handlers: { [k in APIPath]: APIHandler<k> } = {
   'get-mana-summary-stats': getManaSummaryStats,
   'get-active-user-mana-stats': getActiveUserManaStats,
   'get-top-markets-yesterday': getTopMarketsYesterday,
-  'register-gidx': register,
-  'get-verification-status-gidx': getVerificationStatus,
-  'upload-document-gidx': uploadDocument,
-  'get-verification-documents-gidx': getVerificationDocuments,
-  'get-monitor-status-gidx': getMonitorStatus,
   'get-best-comments': getBestComments,
   'record-comment-view': recordCommentView,
   txns: getTxns,

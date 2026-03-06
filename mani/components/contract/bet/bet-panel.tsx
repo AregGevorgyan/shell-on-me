@@ -26,10 +26,6 @@ import {
   formatWithToken,
 } from 'common/util/format'
 import { removeUndefinedProps } from 'common/util/object'
-import {
-  getVerificationStatus,
-  PROMPT_USER_VERIFICATION_MESSAGES,
-} from 'common/gidx/user'
 import { router } from 'expo-router'
 import { SWEEPIES_NAME } from 'common/envs/constants'
 import { LimitBet } from 'common/bet'
@@ -144,21 +140,9 @@ export function BetPanelContent({
       setSubmittedBet(null)
     }
   }, [updatedBet, submittedBet])
-  const NEEDS_TO_REGISTER =
-    'You need to register to participate in this contest'
   // Check for errors.
   useEffect(() => {
     if (!user || !privateUser) return
-    if (token === 'CASH') {
-      const { status, message } = getVerificationStatus(user, privateUser)
-      if (PROMPT_USER_VERIFICATION_MESSAGES.includes(message)) {
-        setError(NEEDS_TO_REGISTER)
-        return
-      } else if (status === 'error') {
-        setError(message)
-        return
-      }
-    }
     if (
       user &&
       ((token === 'MANA' &&

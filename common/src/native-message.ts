@@ -1,5 +1,13 @@
-import { GPSData } from 'common/gidx/gidx'
 import { Notification } from 'common/notification'
+
+type GPSData = {
+  Radius: number
+  Altitude: number
+  Latitude: number
+  Longitude: number
+  Speed: number
+  DateTime: string
+}
 
 export type nativeToWebMessageType =
   | 'iapReceipt'

@@ -28,10 +28,6 @@ import {
   MultiContract,
 } from 'common/contract'
 import { TRADE_TERM } from 'common/envs/constants'
-import {
-  getVerificationStatus,
-  PROMPT_USER_VERIFICATION_MESSAGES,
-} from 'common/gidx/user'
 import { CandidateBet } from 'common/new-bet'
 import { getFormattedMappedValue } from 'common/pseudo-numeric'
 import { getStonkDisplayShares, STONK_NO, STONK_YES } from 'common/stonk'
@@ -64,7 +60,6 @@ import { isAndroid, isIOS } from 'web/lib/util/device'
 import { Button } from '../buttons/button'
 import { WarningConfirmationButton } from '../buttons/warning-confirmation-button'
 import { getAnswerColor } from '../charts/contract/choice'
-import { LocationMonitor } from '../gidx/location-monitor'
 import { Col } from '../layout/col'
 import { Row } from '../layout/row'
 import { AmountInput, BuyAmountInput } from '../widgets/amount-input'
@@ -583,18 +578,11 @@ export const BuyPanelBody = (
       setLastBetDetails(null)
     }
   }
-  const [showLocationMonitor, setShowLocationMonitor] = useState(false)
-
-  const { status: verificationStatus, message: verificationMessage } =
-    getVerificationStatus(user, privateUser)
-
   const betDisabled =
     isSubmitting ||
     !betAmount ||
     outcome === undefined ||
-    error === 'Insufficient balance' ||
-    showLocationMonitor ||
-    (isCashContract && verificationStatus !== 'success')
+    error === 'Insufficient balance'
 
   const limits =
     contract.outcomeType === 'STONK'
@@ -643,10 +631,6 @@ export const BuyPanelBody = (
   // Use PAMPU as pseudonym for YES outcome when user has the skin
   const pseudonymName =
     propPseudonymName ?? (hasPampu && outcome === 'YES' ? 'PAMPU' : undefined)
-
-  const shouldPromptVerification =
-    isCashContract &&
-    PROMPT_USER_VERIFICATION_MESSAGES.includes(verificationMessage)
 
   const betType = isStonk ? 'Market' : betTypeSetting
   const isMobile = useIsMobile()
@@ -954,21 +938,7 @@ export const BuyPanelBody = (
         {betType !== 'Limit' && (
           <Col className="gap-2">
             {user ? (
-              shouldPromptVerification ? (
-                <span className="text-error">
-                  New sweepstakes signups disabled{' '}
-                </span>
-              ) : (
-                <>
-                  <LocationMonitor
-                    contract={contract}
-                    user={user}
-                    setShowPanel={setShowLocationMonitor}
-                    showPanel={showLocationMonitor}
-                  />
-                  {isCashContract && verificationStatus !== 'success' && (
-                    <div className="text-error">{verificationMessage}</div>
-                  )}
+              <>
                   <WarningConfirmationButton
                     marketType="binary"
                     amount={betAmount}

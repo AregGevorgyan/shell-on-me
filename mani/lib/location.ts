@@ -1,6 +1,14 @@
 import * as Location from 'expo-location'
-import { GPSData } from 'common/gidx/gidx'
 import { MINUTE_MS } from 'common/util/time'
+
+type GPSData = {
+  Latitude: number
+  Longitude: number
+  Altitude: number | null
+  Radius: number | null
+  Speed: number | null
+  DateTime: string
+}
 
 export const checkLocationPermission = async () => {
   const { status } = await Location.getForegroundPermissionsAsync()

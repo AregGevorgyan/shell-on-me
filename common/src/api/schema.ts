@@ -50,13 +50,7 @@ import {
 import { DisplayUser, FullUser } from './user-types'
 
 import { ContractMetric } from 'common/contract-metric'
-import {
-  GIDXDocument,
-  GPSProps,
-  verificationParams,
-} from 'common/gidx/gidx'
 import { Notification } from 'common/notification'
-import { RegistrationReturnType } from 'common/reason-codes'
 import { NON_POINTS_BETS_LIMIT } from 'common/supabase/bets'
 import { PrivateMessageChannel } from 'common/supabase/private-messages'
 import { notification_preference } from 'common/user-notification-preferences'
@@ -1903,61 +1897,6 @@ export const API = (_apiTypeCheck = {
         limitDays: z.coerce.number(),
       })
       .strict(),
-  },
-  'register-gidx': {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    props: verificationParams,
-    returns: {} as RegistrationReturnType,
-  },
-  'get-verification-status-gidx': {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as {
-      status: string
-      documents?: GIDXDocument[]
-      message?: string
-      documentStatus?: string
-    },
-    props: z.object({}),
-  },
-  'get-monitor-status-gidx': {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as {
-      status: string
-      message?: string
-    },
-    props: z.object({
-      DeviceGPS: GPSProps,
-    }),
-  },
-  'get-verification-documents-gidx': {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as {
-      status: string
-      documents: GIDXDocument[]
-      utilityDocuments: GIDXDocument[]
-      idDocuments: GIDXDocument[]
-      rejectedDocuments: GIDXDocument[]
-    },
-    props: z.object({}),
-  },
-  'upload-document-gidx': {
-    method: 'POST',
-    visibility: 'undocumented',
-    authed: true,
-    returns: {} as { status: string },
-    props: z.object({
-      CategoryType: z.number().gte(1).lte(7),
-      fileName: z.string(),
-      fileUrl: z.string(),
-    }),
   },
   'get-best-comments': {
     method: 'GET',

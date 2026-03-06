@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git add c:Projectsmanifoldwebpackage.json)"
+      "Bash(git add c:Projectsmanifoldwebpackage.json)",
+      "Bash(grep -rn \"from ''common/gidx\\\\|from \"\"common/gidx\" \"/home/areg_/Code Ubuntu/shell-on-me\" --include=\"*.ts\" --include=\"*.tsx\")"
     ],
     "deny": [],
     "ask": []
