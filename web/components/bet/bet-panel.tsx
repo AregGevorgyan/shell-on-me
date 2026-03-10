@@ -780,7 +780,7 @@ export const BuyPanelBody = (
                 showSlider={true}
                 token={isCashContract ? 'CASH' : 'M$'}
                 sliderColor={pseudonymColor}
-                disregardUserBalance={shouldPromptVerification}
+                disregardUserBalance={false}
                 quickButtonAmountSize={quickAddButtonSize}
               />
 
@@ -989,7 +989,6 @@ export const BuyPanelBody = (
                     inModal={!!onClose}
                   />
                 </>
-              )
             ) : (
               <Button
                 color={outcome === 'NO' ? 'red' : 'green'}
