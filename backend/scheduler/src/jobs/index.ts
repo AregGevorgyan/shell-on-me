@@ -1,6 +1,5 @@
 import { calculateUserTopicInterests } from 'shared/calculate-user-topic-interests'
 import { checkPushNotificationReceipts } from 'shared/check-push-receipts'
-import { calculateConversionScore } from 'shared/conversion-score'
 import { downsamplePortfolioHistory } from 'shared/downsample-portfolio-history'
 import { expireLimitOrders } from 'shared/expire-limit-orders'
 import { calculateGroupImportanceScore } from 'shared/group-importance-score'
@@ -25,19 +24,6 @@ import { cleanOldNotifications } from './clean-old-notifications'
 import { denormalizeAnswers } from './denormalize-answers'
 import { drizzleLiquidity } from './drizzle-liquidity'
 import { createJob } from './helpers'
-import { pollPollResolutions } from './poll-poll-resolutions'
-import { processMembershipRenewals } from './process-membership-renewals'
-import {
-  refreshAchAccountAge,
-  refreshAchComments,
-  refreshAchCreatorContracts,
-  refreshAchCreatorTraders,
-  refreshAchLeagues,
-  refreshAchPnl,
-  refreshAchReferrals,
-  refreshAchTxns,
-  refreshAchVolume,
-} from './refresh-achievement-mvs'
 import { resetBettingStreaksInternal } from './reset-betting-streaks'
 import { resetPgStats } from './reset-pg-stats'
 import {
@@ -48,7 +34,6 @@ import { resetWeeklyEmailsFlags } from './reset-weekly-emails-flags'
 import { scoreContracts } from './score-contracts'
 import { sendMarketCloseEmails } from './send-market-close-emails'
 import { sendStreakExpirationNotification } from './streak-expiration-notice'
-import { unbanUsers } from './unban-users'
 import { updateLeague } from './update-league'
 import { updateLeagueRanks } from './update-league-ranks'
 import { updateStatsCore } from './update-stats'
@@ -102,11 +87,6 @@ export function createJobs() {
       () => sendMarketMovementNotifications(false)
     ),
     createJob(
-      'calculate-conversion-scores',
-      '0 46 * * * *', // on the 46th minute of every hour
-      calculateConversionScore
-    ),
-    createJob(
       'auto-award-bounty',
       '0 55 * * * *', // on the 55th minute of every hour
       autoAwardBounty
@@ -127,11 +107,6 @@ export function createJobs() {
       expireLimitOrders
     ),
     createJob(
-      'unban-users',
-      '0 0 * * * *', // every hour
-      unbanUsers
-    ),
-    createJob(
       'score-contracts',
       `0 */${isProd() ? IMPORTANCE_MINUTE_INTERVAL : 60} * * * *`, // every 2 minutes
       scoreContracts
@@ -142,21 +117,11 @@ export function createJobs() {
       denormalizeAnswers
     ),
     createJob(
-      'poll-poll-resolutions',
-      '0 */1 * * * *', // every minute
-      pollPollResolutions
-    ),
-    createJob(
       'apply-pending-clarifications',
       '0 */5 * * * *', // every 5 minutes
       applyPendingClarifications
     ),
     // Daily jobs:
-    createJob(
-      'process-membership-renewals',
-      '0 0 8 * * *', // 8 AM UTC daily (midnight PT)
-      processMembershipRenewals
-    ),
     createJob(
       'send-unseen-notifications',
       '0 0 13 * * *', // 1 PM daily
@@ -164,59 +129,8 @@ export function createJobs() {
     ),
     createJob(
       'clean-old-notifications',
-      '0 30 2 * * *', // 230 AM daily
+      '0 30 2 * * *', // 2:30 AM daily
       cleanOldNotifications
-    ),
-    // // Achievement MV refreshes (nightly, staggered ~10 mins apart)
-    // createJob(
-    //   'update-ach-trades',
-    //   '0 10 2 * * *', // 2:10 AM daily
-    //   updateAchTrades
-    // ),
-    createJob(
-      'refresh-ach-volume',
-      '0 30 2 * * *', // 2:30 AM
-      refreshAchVolume
-    ),
-    createJob(
-      'refresh-ach-comments',
-      '0 40 2 * * *', // 2:40 AM
-      refreshAchComments
-    ),
-    createJob(
-      'refresh-ach-creator-contracts',
-      '0 50 2 * * *', // 2:50 AM
-      refreshAchCreatorContracts
-    ),
-    createJob(
-      'refresh-ach-referrals',
-      '0 0 3 * * *', // 3:00 AM
-      refreshAchReferrals
-    ),
-    createJob(
-      'refresh-ach-creator-traders',
-      '0 10 3 * * *', // 3:10 AM
-      refreshAchCreatorTraders
-    ),
-    createJob(
-      'refresh-ach-leagues',
-      '0 20 3 * * *', // 3:20 AM
-      refreshAchLeagues
-    ),
-    createJob(
-      'refresh-ach-pnl',
-      '0 30 3 * * *', // 3:30 AM
-      refreshAchPnl
-    ),
-    createJob(
-      'refresh-ach-txns',
-      '0 40 3 * * *', // 3:40 AM
-      refreshAchTxns
-    ),
-    createJob(
-      'refresh-ach-account-age',
-      '0 50 3 * * *', // 3:50 AM
-      refreshAchAccountAge
     ),
     createJob(
       'update-user-metric-periods',
