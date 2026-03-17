@@ -4,7 +4,7 @@
 
 | Service | Platform | Notes |
 |---|---|---|
-| Web | Vercel | Auto-deploys on push to `main` |
+| Web | Vercel | https://shell-on-me-market.vercel.app — auto-deploys on push to `main` |
 | API | Render (free tier) | Docker, auto-deploys on push to `main` |
 | Scheduler | AWS ECS Fargate | Always-on, deploy via script |
 | Database | Supabase | Postgres, manual schema management |
@@ -37,8 +37,9 @@ Connect the repo to Vercel for `web/`. Configure:
 Create a Firebase project. Configure:
 
 - Google sign-in enabled, all other providers disabled
-- Authorized domains for your app domain(s)
-- `@startupshell.org`-restricted usage (enforced in backend)
+- Authorized domains: add `shell-on-me-market.vercel.app` (and any custom domain if added later)
+
+**Note: Firebase domain-based sign-in restriction is a paid (Blaze) feature.** Restricting sign-in to `@startupshell.org` accounts cannot be enforced at the Firebase level on the free Spark plan. This restriction is enforced in the backend API auth middleware instead.
 
 Obtain a service account key: Firebase Console → Project Settings → Service Accounts → Generate new private key. You will need this as `FIREBASE_SERVICE_ACCOUNT_KEY` (JSON as a single-line string).
 
@@ -98,7 +99,7 @@ API endpoints:
 ### Frontend (Vercel)
 
 ```bash
-NEXT_PUBLIC_APP_DOMAIN=startupshell.org
+NEXT_PUBLIC_APP_DOMAIN=shell-on-me-market.vercel.app
 NEXT_PUBLIC_API_ENDPOINT=
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=
 NEXT_PUBLIC_FIREBASE_API_KEY=
@@ -285,7 +286,8 @@ AWS console → ECS → Clusters → shell → Services → shell-scheduler-prod
 Before production rollout, verify:
 
 - Non-Google auth providers are disabled in Firebase
-- `@startupshell.org`-only sign-in is enforced
+- `shell-on-me-market.vercel.app` is listed as an authorized domain in Firebase
+- `@startupshell.org`-only sign-in is enforced via backend auth middleware (Firebase domain restriction is not available on the free Spark plan)
 - `STARTUPSHELL_ADMIN_IDS` is set correctly in Vercel
 - Production and dev Firebase projects are not accidentally swapped
 
