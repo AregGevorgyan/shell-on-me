@@ -1,8 +1,5 @@
-import { authEndpoint } from './helpers/endpoint'
+import { RequestHandler } from 'express'
 
-export const health = authEndpoint(async (_, auth) => {
-  return {
-    message: 'Server is working.',
-    uid: auth.uid,
-  }
-})
+export const health: RequestHandler = (_req, res) => {
+  res.json({ message: 'Server is working.' })
+}

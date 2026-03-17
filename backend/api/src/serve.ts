@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin'
-import { getLocalEnv, initAdmin } from 'shared/init-admin'
-import { loadSecretsToEnv, getServiceAccountCredentials } from 'common/secrets'
+import { initAdmin } from 'shared/init-admin'
+import { loadSecretsToEnv } from 'common/secrets'
 import { LOCAL_DEV, log } from 'shared/utils'
 import { METRIC_WRITER } from 'shared/monitoring/metric-writer'
 import { initCaches } from 'shared/init-caches'
@@ -11,10 +11,13 @@ log('Api server starting up...')
 if (LOCAL_DEV) {
   initAdmin()
 } else {
-  const projectId = process.env.GOOGLE_CLOUD_PROJECT
+  const projectId = process.env.FIREBASE_PROJECT_ID
   admin.initializeApp({
     projectId,
     storageBucket: `${projectId}.appspot.com`,
+    credential: admin.credential.cert(
+      JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY!)
+    ),
   })
 }
 
@@ -22,15 +25,10 @@ METRIC_WRITER.start()
 
 import { app } from './app'
 
-const credentials = LOCAL_DEV
-  ? getServiceAccountCredentials(getLocalEnv())
-  : // No explicit credentials needed for deployed service.
-    undefined
-
 const DB_RESPONSE_TIMEOUT = 30_000
 
 const startupProcess = async () => {
-  await loadSecretsToEnv(credentials)
+  await loadSecretsToEnv()
   log('Secrets loaded.')
 
   log('Starting server <> postgres timeout')

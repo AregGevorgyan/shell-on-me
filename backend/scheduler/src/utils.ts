@@ -1,36 +1,26 @@
 import * as admin from 'firebase-admin'
-import { getLocalEnv } from 'shared/init-admin'
-import { getServiceAccountCredentials, loadSecretsToEnv } from 'common/secrets'
-import { log } from 'shared/utils'
+import { initAdmin } from 'shared/init-admin'
+import { loadSecretsToEnv } from 'common/secrets'
+import { LOCAL_DEV, log } from 'shared/utils'
 
 export function initFirebase() {
-  try {
-    admin.initializeApp()
-    log.info('Initialized firebase using GCP service account access.')
-  } catch {
-    const env = getLocalEnv()
-    const credentials = getServiceAccountCredentials(env)
+  if (LOCAL_DEV) {
+    initAdmin()
+    log.info('Initialized Firebase using local credentials.')
+  } else {
+    const projectId = process.env.FIREBASE_PROJECT_ID
     admin.initializeApp({
-      projectId: credentials.project_id,
-      credential: admin.credential.cert(credentials),
-      storageBucket: `${credentials.project_id}.appspot.com`,
+      projectId,
+      storageBucket: `${projectId}.appspot.com`,
+      credential: admin.credential.cert(
+        JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY!)
+      ),
     })
-    log.info(
-      `Initialized firebase using local credentials for ${credentials.project_id}.`
-    )
+    log.info(`Initialized Firebase for project ${projectId}.`)
   }
 }
 
 export async function initSecrets() {
-  try {
-    await loadSecretsToEnv()
-    log.info('Loaded secrets using GCP service account access.')
-  } catch {
-    const env = getLocalEnv()
-    const credentials = getServiceAccountCredentials(env)
-    await loadSecretsToEnv(credentials)
-    log.info(
-      `Loaded secrets using local credentials for ${credentials.project_id}.`
-    )
-  }
+  await loadSecretsToEnv()
+  log.info('Secrets ready.')
 }

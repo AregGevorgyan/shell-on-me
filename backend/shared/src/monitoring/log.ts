@@ -13,7 +13,7 @@ const JS_TO_GCP_LEVELS = {
 
 const JS_LEVELS = Object.keys(JS_TO_GCP_LEVELS) as LogLevel[]
 const DEFAULT_LEVEL = 'info'
-const IS_GCP = process.env.GOOGLE_CLOUD_PROJECT != null
+const IS_PROD = process.env.IS_PROD === 'true'
 
 // keys to put in front to categorize a log line in the console
 const DISPLAY_CATEGORY_KEYS = ['endpoint', 'job'] as const
@@ -72,7 +72,7 @@ function writeLog(
     const contextData = getMonitoringContext()
     const message = format(toString(msg), ...(rest ?? []))
     const data = { ...(contextData ?? {}), ...(props ?? {}) }
-    if (IS_GCP) {
+    if (IS_PROD) {
       const severity = JS_TO_GCP_LEVELS[level]
       const output: LogDetails = {
         severity,

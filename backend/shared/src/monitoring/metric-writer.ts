@@ -1,107 +1,16 @@
-import { MetricServiceClient } from '@google-cloud/monitoring'
-import { average, sumOfSquaredError } from 'common/util/math'
-import { LOCAL_DEV, log } from 'shared/utils'
-import { InstanceInfo, getInstanceInfo } from './instance-info'
-import { chunk } from 'lodash'
-import {
-  CUSTOM_METRICS,
-  MetricStore,
-  MetricStoreEntry,
-  metrics,
-} from './metrics'
+import { log } from 'shared/utils'
+import { MetricStore } from './metrics'
 
-// how often metrics are written. GCP says don't write for a single time series
-// more than once per 5 seconds.
+// how often metrics are logged
 export const METRICS_INTERVAL_MS = 60_000
 
-function serializeTimestamp(ts: number) {
-  const seconds = ts / 1000
-  const nanos = (ts % 1000) * 1000
-  return { seconds, nanos } as const
-}
-
-// see https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.snoozes#timeinterval
-function serializeInterval(entry: MetricStoreEntry, ts: number) {
-  switch (CUSTOM_METRICS[entry.type].metricKind) {
-    case 'CUMULATIVE':
-      return {
-        startTime: serializeTimestamp(entry.startTime),
-        endTime: serializeTimestamp(ts),
-      }
-    case 'GAUGE': {
-      return { endTime: serializeTimestamp(ts) }
-    }
-  }
-}
-
-function serializeDistribution(points: number[]) {
-  // see https://cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#distribution
-  return {
-    count: points.length,
-    mean: average(points),
-    sumOfSquaredDeviation: sumOfSquaredError(points),
-    // not interested in handling histograms right now
-    bucketOptions: { explicitBuckets: { bounds: [0] } },
-    bucketCounts: [0, points.length],
-  }
-}
-
-// see https://cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue
-function serializeValue(entry: MetricStoreEntry) {
-  switch (CUSTOM_METRICS[entry.type].valueKind) {
-    case 'int64Value':
-      return { int64Value: entry.value }
-    case 'distributionValue': {
-      return { distributionValue: serializeDistribution(entry.points ?? []) }
-    }
-    default:
-      throw new Error('Other value kinds not yet implemented.')
-  }
-}
-
-// see https://cloud.google.com/monitoring/api/ref_v3/rest/v3/TimeSeries
-function serializeEntries(
-  instance: InstanceInfo,
-  entries: MetricStoreEntry[],
-  ts: number
-) {
-  return entries.map((entry) => ({
-    metricKind: CUSTOM_METRICS[entry.type].metricKind,
-    resource: {
-      type: 'gce_instance',
-      labels: {
-        project_id: instance.projectId,
-        instance_id: instance.instanceId,
-        zone: instance.zone,
-      },
-    },
-    metric: {
-      type: `custom.googleapis.com/${entry.type}`,
-      labels: {
-        ...(entry.labels ?? {}),
-        instance_type: process.env.READ_ONLY ? 'read' : 'write',
-        port: process.env.PORT ?? 'unknown',
-      },
-    },
-    points: [
-      {
-        interval: serializeInterval(entry, ts),
-        value: serializeValue(entry),
-      },
-    ],
-  }))
-}
-
-/** Writes metrics out to GCP's API from a metric store on an interval. */
+/** Logs fresh metric entries as structured JSON to stdout. */
 export class MetricWriter {
-  client: MetricServiceClient
   store: MetricStore
   intervalMs: number
-  instance?: InstanceInfo
   runInterval?: NodeJS.Timeout
 
   constructor(store: MetricStore, intervalMs: number) {
-    this.client = new MetricServiceClient()
     this.store = store
     this.intervalMs = intervalMs
   }
@@ -112,25 +21,8 @@ export class MetricWriter {
       for (const entry of freshEntries) {
         entry.fresh = false
       }
-      if (!LOCAL_DEV) {
-        log.debug('Writing GCP metrics.', { entries: freshEntries })
-        if (this.instance == null) {
-          this.instance = await getInstanceInfo()
-          log.debug('Retrieved instance metadata.', {
-            instance: this.instance,
-          })
-        }
-        // mqp: bump now by 1ms to avoid it being === to just written entry times
-        const now = Date.now() + 1
-        const name = this.client.projectPath(this.instance.projectId)
-        const timeSeries = serializeEntries(this.instance, freshEntries, now)
-        // GCP imposes a max 200 per call limit
-        for (const batch of chunk(timeSeries, 200)) {
-          this.store.clearDistributionGauges()
-          // see https://cloud.google.com/monitoring/custom-metrics/creating-metrics
-          await this.client.createTimeSeries({ timeSeries: batch, name })
-        }
-      }
+      this.store.clearDistributionGauges()
+      log.debug('Metrics snapshot', { entries: freshEntries })
     }
   }
 
@@ -151,4 +43,5 @@ export class MetricWriter {
   }
 }
 
+import { metrics } from './metrics'
 export const METRIC_WRITER = new MetricWriter(metrics, METRICS_INTERVAL_MS)

@@ -1,11 +1,7 @@
-import { readFileSync } from 'fs'
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 import { zip } from 'lodash'
 
-// List of secrets that are available to backend (api, functions, scripts, etc.)
-// Edit them at:
-// prod - https://console.cloud.google.com/security/secret-manager?project=mantic-markets
-// dev - https://console.cloud.google.com/security/secret-manager?project=dev-mantic-markets
+// List of secrets available to backend (api, scheduler, scripts, etc.)
+// Set these as environment variables in Render dashboard and ECS task definition.
 export const secrets = (
   [
     'API_SECRET',
@@ -45,77 +41,21 @@ export const secrets = (
 
 type SecretId = (typeof secrets)[number]
 
-// Fetches all secrets from google cloud.
-// For deployed google cloud service, no credential is needed.
-// For local and Vercel deployments: requires credentials json object.
-export const getSecrets = async (credentials?: any, ...ids: SecretId[]) => {
-  let client: SecretManagerServiceClient
-  if (credentials) {
-    const projectId = credentials['project_id']
-    client = new SecretManagerServiceClient({
-      credentials,
-      projectId,
-    })
-  } else {
-    client = new SecretManagerServiceClient()
-  }
-  const projectId = await client.getProjectId()
-
+// Reads secrets from environment variables.
+// All secrets must be set as env vars in Render dashboard / ECS task definition.
+export const getSecrets = async (_credentials?: any, ...ids: SecretId[]) => {
   const secretIds = ids.length > 0 ? ids : secrets
-
-  const fullSecretNames = secretIds.map(
-    (secret: string) =>
-      `${client.projectPath(projectId)}/secrets/${secret}/versions/latest`
-  )
-
-  const secretResponses = await Promise.all(
-    fullSecretNames.map((name) =>
-      client.accessSecretVersion({
-        name,
-      })
-    )
-  )
-  const secretValues = secretResponses.map(([response]) =>
-    response.payload!.data!.toString()
-  )
-  const pairs = zip(secretIds, secretValues) as [string, string][]
+  const pairs = secretIds.map((id) => [id, process.env[id]] as [string, string])
   return Object.fromEntries(pairs)
 }
 
-// Fetches all secrets and loads them into process.env.
-// Useful for running random backend code.
-export const loadSecretsToEnv = async (credentials?: any) => {
-  const allSecrets = await getSecrets(credentials)
+// Loads secrets into process.env (no-op on Render/ECS where they're already set,
+// but keeps the same interface for local dev compatibility).
+export const loadSecretsToEnv = async (_credentials?: any) => {
+  const allSecrets = await getSecrets()
   for (const [key, value] of Object.entries(allSecrets)) {
-    if (key && value) {
+    if (key && value && !process.env[key]) {
       process.env[key] = value
     }
-  }
-}
-
-// Get service account credentials from Vercel environment variable or local file.
-export const getServiceAccountCredentials = (env: 'PROD' | 'DEV') => {
-  // Vercel environment variable for service credential.
-  const value =
-    env === 'PROD'
-      ? process.env.PROD_FIREBASE_SERVICE_ACCOUNT_KEY
-      : process.env.DEV_FIREBASE_SERVICE_ACCOUNT_KEY
-  if (value) {
-    return JSON.parse(value)
-  }
-
-  // Local environment variable for service credential.
-  const envVar = `GOOGLE_APPLICATION_CREDENTIALS_${env}`
-  const keyPath = process.env[envVar]
-  if (keyPath == null) {
-    throw new Error(
-      `Please set the ${envVar} environment variable to contain the path to your ${env} environment key file.`
-    )
-  }
-
-  try {
-    return JSON.parse(readFileSync(keyPath, { encoding: 'utf8' }))
-  } catch {
-    throw new Error(`Failed to load service account key from ${keyPath}.`)
   }
 }

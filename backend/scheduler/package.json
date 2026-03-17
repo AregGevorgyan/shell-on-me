@@ -20,8 +20,6 @@
   "dependencies": {
     "@amplitude/node": "1.10.2",
     "@anthropic-ai/sdk": "0.60.0",
-    "@google-cloud/monitoring": "4.0.0",
-    "@google-cloud/secret-manager": "4.2.1",
     "@google/generative-ai": "0.24.0",
     "@stdlib/math-base-special-betaincinv": "0.2.1",
     "@supabase/supabase-js": "2.38.5",
@@ -39,7 +37,6 @@
     "express": "4.18.1",
     "express-basic-auth": "1.2.1",
     "firebase-admin": "11.11.1",
-    "gcp-metadata": "6.1.0",
     "handlebars": "4.7.8",
     "lodash": "4.17.21",
     "mailgun-js": "0.22.0",

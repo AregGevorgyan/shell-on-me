@@ -1,4 +1,6 @@
-# StartupShell Plan
+# Shell-On-Me Plan
+
+@.cursor/rules/general-knowledge.mdc for more some more details
 
 ## Objective
 Operate this codebase as a private StartupShell prediction market using fake currency (Shell Token), restricted to `@startupshell.org` members.
@@ -134,3 +136,14 @@ npx tsc --project web/tsconfig.json --noEmit
 1. Run a repo-wide final copy sweep for remaining user-facing “Mana/Manifold” strings and patch safe candidates.
 2. Test essential account/security email delivery in staging with allowlist restrictions enabled.
 3. Add a short deploy rollback section to `README.md`.
+
+
+# Design Guidelines
+Font: Titillium Web family
+Colors:
+- snow white #FBF5F3
+- CG RED #D74034
+- Smokey black #0F0C08
+- Sweet brown #AC3931
+- Black coffee #3B2F2F
+- Battleship grey #788585
