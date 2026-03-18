@@ -45,7 +45,7 @@ export const ManaSupplySummary = (props: {
 
   return (
     <>
-      <Title>Mana supply over time</Title>
+      <Title>Shell Token supply over time</Title>
       <StackedChart data={manaData} />
     </>
   )

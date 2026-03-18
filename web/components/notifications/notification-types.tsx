@@ -455,15 +455,6 @@ export function NotificationItem(props: {
         setHighlighted={setHighlighted}
       />
     )
-  } else if (reason === 'manifest_airdrop') {
-    return (
-      <ManifestAirdropNotification
-        notification={notification}
-        isChildOfGroup={isChildOfGroup}
-        highlighted={highlighted}
-        setHighlighted={setHighlighted}
-      />
-    )
   } else if (reason === 'extra_purchased_mana') {
     return (
       <ExtraPurchasedManaNotification
@@ -2134,31 +2125,6 @@ function AirdropNotification(props: {
       Congratulations! You just received{' '}
       <span className="font-semibold">{formatMoney(amount)}</span>as a gift from
       Manifold for being active for 30 days this year!
-    </NotificationFrame>
-  )
-}
-
-function ManifestAirdropNotification(props: {
-  notification: Notification
-  highlighted: boolean
-  setHighlighted: (highlighted: boolean) => void
-  isChildOfGroup?: boolean
-}) {
-  const { notification, highlighted, setHighlighted, isChildOfGroup } = props
-  const { amount } = notification.data as AirdropData
-
-  return (
-    <NotificationFrame
-      notification={notification}
-      isChildOfGroup={isChildOfGroup}
-      highlighted={highlighted}
-      setHighlighted={setHighlighted}
-      icon={<GiftIcon className="text-primary-500 h-8 w-8" />}
-      subtitle={<></>}
-    >
-      Congratulations! As a gift for attending Manifest, you just received{' '}
-      <span className="font-semibold">{formatMoney(amount)}</span> and{' '}
-      <SpiceCoin /> 5,000!
     </NotificationFrame>
   )
 }

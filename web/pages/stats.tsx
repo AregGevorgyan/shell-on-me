@@ -422,7 +422,7 @@ function ActivityTab(props: {
         ]}
       />
       <Spacer h={8} />
-      <Title>Total mana {TRADED_TERM}</Title>
+      <Title>Total Shell Token {TRADED_TERM}</Title>
       <p className="text-ink-500">
         Sum of {TRADE_TERM} amounts. (Divided by 100 to be more readable.)
       </p>
@@ -594,10 +594,10 @@ function ManaSupplyTab(props: {
 
   return (
     <Col>
-      <Title>Mana supply</Title>
+      <Title>Shell Token supply</Title>
       <div className="text-ink-700 mb-4 grid grid-cols-2 justify-items-end gap-y-1">
         <div className="text-ink-800 mb-2">Supply Today</div>
-        <div className="text-ink-800 mb-2">Mana</div>
+        <div className="text-ink-800 mb-2">Shell Tokens</div>
 
         <div>Balances</div>
         <div className="font-semibold">
@@ -675,9 +675,9 @@ function ManaSalesTab(props: { stats: rowfor<'daily_stats'>[] }) {
 
   return (
     <Col>
-      <Title>Mana sales</Title>
+      <Title>Shell Token sales</Title>
       <p className="text-ink-500">
-        <b>${formatWithCommas(last30dSales)}</b> of mana sold in the last 30d
+        <b>${formatWithCommas(last30dSales)}</b> of Shell Tokens sold in the last 30d
         <br />
       </p>
       <Spacer h={4} />
@@ -1067,7 +1067,7 @@ export function CustomAnalytics(props: {
             ),
           },
           {
-            title: 'Mana Supply',
+            title: 'Shell Token Supply',
             content: (
               <ManaSupplyTab
                 manaSupplyOverTime={manaSupplyOverTime}
@@ -1078,7 +1078,7 @@ export function CustomAnalytics(props: {
             ),
           },
           {
-            title: 'Mana Sales',
+            title: 'Shell Token Sales',
             content: <ManaSalesTab stats={localStats} />,
           },
           {

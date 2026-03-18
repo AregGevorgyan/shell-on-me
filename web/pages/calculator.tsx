@@ -19,8 +19,8 @@ export default function CalculatorPage() {
   return (
     <Page trackPageView={'calculator'}>
       <SEO
-        title="Manaswap Calculator"
-        description="Calculate your betting odds on Manifold"
+        title="Shell Swap Calculator"
+        description="Calculate your betting odds on Shell-on-me"
         url="/calculator"
       />
       <Calculator />

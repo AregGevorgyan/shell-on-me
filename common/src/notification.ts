@@ -82,7 +82,6 @@ export type notification_source_types =
   | love_notification_source_types
   | 'push_notification_bonus'
   | 'airdrop'
-  | 'manifest_airdrop'
   | 'extra_purchased_mana'
   | 'payment_status'
   | 'membership_subscription'
@@ -316,16 +315,12 @@ export const NOTIFICATION_DESCRIPTIONS: notification_descriptions = {
   },
   airdrop: {
     simple: 'You received a gift of Shell Tokens',
-    detailed: 'Manifold has sent you a gift of Shell Tokens',
-  },
-  manifest_airdrop: {
-    simple: 'You received a gift for attending Manifest',
-    detailed: 'Manifold has sent you a gift for attending Manifest',
+    detailed: 'Shell-on-me has sent you a gift of Shell Tokens',
   },
   extra_purchased_mana: {
     simple: 'You just received 9x your purchased Shell Tokens in 2024',
     detailed:
-      'Manifold has sent you a gift of 9x your purchased Shell Tokens in 2024.',
+      'Shell-on-me has sent you a gift of 9x your purchased Shell Tokens in 2024.',
   },
   payment_status: {
     simple: 'Payment updates',

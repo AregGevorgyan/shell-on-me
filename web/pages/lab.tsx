@@ -21,26 +21,10 @@ export default function LabsPage() {
           <LabLink href="/about">About</LabLink>
           {useAdmin() && <LabLink href="/admin">Admin</LabLink>}
           <LabLink href="/stats">Stats</LabLink>
-          <LabLink href="https://github.com/manifoldmarkets/manifold">
-            Github
-          </LabLink>
           <LabLink href="/api">API</LabLink>
-          <LabLink href="https://manifoldmarkets.notion.site/About-4a1e35b5cedf43998161609eea887679">
-            More
-          </LabLink>
         </div>
       </div>
       <LabSection>
-        <LabCard
-          title="💌 Manifold.love"
-          description="Crowd source your long term matches!"
-          href="https://manifold.love"
-        />
-        <LabCard
-          title="🎤 Mana-chan"
-          description="Tweets from our anime spokesgirl"
-          href="/manachan"
-        />
         <LabCard
           title="💬 Discord bot"
           description="Create, trade, & share questions from Discord"
@@ -76,22 +60,17 @@ export default function LabsPage() {
         />
         <LabCard
           title="⚔️ Versus"
-          description="Create mana-battles between two ideas"
+          description="Create battles between two ideas"
           href="/VersusBot?tab=questions"
         />
         <LabCard
-          title="🎴 Manifold: The Gambling"
-          description="Match each question to its creator"
-          href="/cards"
-        />
-        <LabCard
-          title="💰 Mana auction"
+          title="💰 Shell Token auction"
           description={`A dollar auction but for ${formatMoney(10000)}`}
           href="/mana-auction"
         />
         <LabCard
           title="👀 Classified Ads"
-          description="An old version of question boosts that let you advertise anything. View ads for mana!"
+          description="An old version of question boosts that let you advertise anything."
           href="/ad"
         />
         <LabCard title="🐮 Moolinda" description="???" href="/cowp" />

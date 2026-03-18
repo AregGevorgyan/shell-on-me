@@ -47,7 +47,6 @@ export type notification_preferences = {
   limit_order_fills: notification_destination_types[]
   quest_payout: notification_destination_types[]
   airdrop: notification_destination_types[]
-  manifest_airdrop: notification_destination_types[]
   extra_purchased_mana: notification_destination_types[]
   payment_status: notification_destination_types[]
   membership_subscription: notification_destination_types[]
@@ -148,7 +147,6 @@ export const getDefaultNotificationPreferences = (isDev?: boolean) => {
     limit_order_fills: constructPref(true, false, true),
     quest_payout: constructPref(true, false, false),
     airdrop: constructPref(true, false, false),
-    manifest_airdrop: constructPref(true, false, false),
     extra_purchased_mana: constructPref(true, false, false),
     payment_status: constructPref(true, false, false),
     membership_subscription: constructPref(true, true, true),

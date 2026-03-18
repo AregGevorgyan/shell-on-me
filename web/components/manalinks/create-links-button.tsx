@@ -120,7 +120,7 @@ function CreateManalinkForm(props: {
             setFinishedCreating(true)
           }}
         >
-          <Title className="!my-0">Create a Manalink</Title>
+          <Title className="!my-0">Create a Shell Link</Title>
 
           <div className="flex flex-col flex-wrap gap-x-5 gap-y-2">
             <div className="flex flex-auto flex-col">
@@ -202,7 +202,7 @@ function CreateManalinkForm(props: {
       )}
       {finishedCreating && (
         <>
-          <Title className="!my-0">Manalink Created!</Title>
+          <Title className="!my-0">Shell Link Created!</Title>
           <ManalinkCard
             className="my-4"
             info={newManalink}

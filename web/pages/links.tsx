@@ -65,13 +65,13 @@ export default function LinkPage(props: {
   return (
     <Page trackPageView={'manalinks page'}>
       <SEO
-        title="Manalinks"
+        title="Shell Links"
         description="Send Shell Tokens to others with a link, even if they don't have a StartupShell account yet."
         url="/links"
       />
       <Col className="mt-6 w-full px-8">
         <Row className="items-start justify-between">
-          <Title>Manalinks</Title>
+          <Title>Shell Links</Title>
           {user && isAdminId(user.id) && (
             <CreateLinksButton
               user={user}
@@ -81,13 +81,13 @@ export default function LinkPage(props: {
           )}
         </Row>
         <p>
-          Manalinks can send Shell Tokens ({ENV_CONFIG.moneyMoniker}) to other people,
+          Shell Links can send Shell Tokens ({ENV_CONFIG.moneyMoniker}) to other people,
           even if they don&apos;t yet have a StartupShell account. As of April
-          2024 only the StartupShell team can create new manalinks.
+          2024 only the StartupShell team can create new Shell Links.
         </p>
 
         <Row className="items-baseline justify-between">
-          <Subtitle>Your Manalinks</Subtitle>
+          <Subtitle>Your Shell Links</Subtitle>
           <Row className="text-ink-500 items-center gap-4 text-sm">
             Show claimed links
             <ShortToggle on={showDisabled} setOn={setShowDisabled} />
