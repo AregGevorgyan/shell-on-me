@@ -7,7 +7,6 @@ import {
 } from '@heroicons/react/outline'
 import clsx from 'clsx'
 import { RanksType } from 'common/achievements'
-import { DIVISION_NAMES, getLeaguePath } from 'common/leagues'
 import { getUserForStaticProps } from 'common/supabase/users'
 import { isUserLikelySpammer } from 'common/user'
 import { unauthedApi } from 'common/util/api'
@@ -58,12 +57,10 @@ import { useAPIGetter } from 'web/hooks/use-api-getter'
 import { useFollowers, useFollows } from 'web/hooks/use-follows'
 import { useHeaderIsStuck } from 'web/hooks/use-header-is-stuck'
 import { useIsMobile } from 'web/hooks/use-is-mobile'
-import { useLeagueInfo } from 'web/hooks/use-leagues'
 import { useSaveReferral } from 'web/hooks/use-save-referral'
 import { usePrivateUser, useUser, useWebsocketUser } from 'web/hooks/use-user'
 import { useUserBans } from 'web/hooks/use-user-bans'
 import { User } from 'web/lib/firebase/users'
-import TrophyIcon from 'web/lib/icons/trophy-icon.svg'
 import { db } from 'web/lib/supabase/db'
 import { api } from 'web/lib/api/api'
 import { getAverageUserRating, getUserRating } from 'web/lib/supabase/reviews'
@@ -477,8 +474,6 @@ function ProfilePublicStats(props: {
     setFollowsTab(tabName)
   }
 
-  const leagueInfo = useLeagueInfo(user.id)
-
   return (
     <Row
       className={clsx(
@@ -500,24 +495,6 @@ function ProfilePublicStats(props: {
       </TextButton>
 
       {isCurrentUser && <UserLikedContractsButton user={user} />}
-
-      {leagueInfo && (
-        <Link
-          className={linkClass}
-          href={getLeaguePath(
-            leagueInfo.season,
-            leagueInfo.division,
-            leagueInfo.cohort,
-            user.id
-          )}
-        >
-          <TrophyIcon className="mb-1 mr-1 inline h-4 w-4" />
-          <span className={clsx('font-semibold')}>
-            {DIVISION_NAMES[leagueInfo.division ?? '']}
-          </span>{' '}
-          Rank {leagueInfo.rank}
-        </Link>
-      )}
 
       <Link className={linkClass} href={`/${user.username}/calibration`}>
         <PresentationChartLineIcon className="mb-1 mr-1 inline h-4 w-4" />
@@ -570,15 +547,10 @@ function AchievementsSection(props: { userId: string }) {
     unprofitableMarketsCount: 'unprofitableMarkets',
     largestProfitableTradeValue: 'largestProfitableTrade',
     largestUnprofitableTradeValue: 'largestUnprofitableTrade',
-    seasonsPlatinumOrHigher: 'seasonsPlatinumOrHigher',
-    seasonsDiamondOrHigher: 'seasonsDiamondOrHigher',
-    seasonsMasters: 'seasonsMasters',
-    largestLeagueSeasonEarnings: 'largestLeagueSeasonEarnings',
     numberOfComments: 'comments',
     totalTradesCount: 'trades',
     totalMarketsCreated: 'marketsCreated',
     accountAgeYears: 'accountAge',
-    longestBettingStreak: 'longestBettingStreak',
     modTicketsResolved: 'modTickets',
     charityDonatedMana: 'charityDonated',
   }
@@ -639,31 +611,6 @@ function AchievementsSection(props: { userId: string }) {
       fmt: () => formatMoney(data.largestUnprofitableTradeValue, 'MANA'),
     },
     {
-      id: 'seasonsPlatinumOrHigher',
-      title: 'Positively Platinum',
-      desc: 'Seasons finished Platinum or higher.',
-      fmt: () => formatWithCommas(data.seasonsPlatinumOrHigher),
-    },
-    {
-      id: 'seasonsDiamondOrHigher',
-      title: 'Diamond Hands',
-      desc: 'Seasons finished Diamond or higher.',
-      fmt: () => formatWithCommas(data.seasonsDiamondOrHigher),
-    },
-    {
-      id: 'seasonsMasters',
-      title: 'Master Mind',
-      desc: 'Seasons finished Masters.',
-      fmt: () => formatWithCommas(data.seasonsMasters),
-    },
-    {
-      id: 'largestLeagueSeasonEarnings',
-      title: 'Sensational Season',
-      desc: 'Largest earnings in a single season.',
-      fmt: () => formatMoney(data.largestLeagueSeasonEarnings, 'MANA'),
-    },
-
-    {
       id: 'numberOfComments',
       title: 'Chatterbox',
       desc: 'Number of comments you’ve posted with at least 1 like.',
@@ -694,12 +641,6 @@ function AchievementsSection(props: { userId: string }) {
         const mLabel = months === 1 ? 'month' : 'months'
         return `${years} ${yLabel} ${months} ${mLabel}`
       },
-    },
-    {
-      id: 'longestBettingStreak',
-      title: 'Longest Daily Streak',
-      desc: 'Longest consecutive days trading.',
-      fmt: () => formatWithCommas(data.longestBettingStreak),
     },
     {
       id: 'modTicketsResolved',
@@ -802,23 +743,14 @@ function AchievementsSection(props: { userId: string }) {
                       creatorTraders: '/achievement-badges/creatorTraders.png',
                       largestProfitableTradeValue:
                         '/achievement-badges/largestProfitableTradeValue.png',
-                      largestLeagueSeasonEarnings:
-                        '/achievement-badges/largestLeagueSeasonEarnings.png',
                       largestUnprofitableTradeValue:
                         '/achievement-badges/largestUnprofitableTradeValue.png',
-                      longestBettingStreak:
-                        '/achievement-badges/longestBettingStreak.png',
                       modTicketsResolved:
                         '/achievement-badges/modTicketsResolved.png',
                       numberOfComments:
                         '/achievement-badges/numberOfComments.png',
                       profitableMarketsCount:
                         '/achievement-badges/profitableMarketsCount.png',
-                      seasonsDiamondOrHigher:
-                        '/achievement-badges/seasonsDiamondOrHigher.png',
-                      seasonsMasters: '/achievement-badges/seasonsMasters.png',
-                      seasonsPlatinumOrHigher:
-                        '/achievement-badges/seasonsPlatinumOrHigher.png',
                       totalLiquidityCreatedMarkets:
                         '/achievement-badges/totalLiquidityCreatedMarkets.png',
                       totalMarketsCreated:

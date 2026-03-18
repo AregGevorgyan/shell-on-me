@@ -81,7 +81,6 @@ import { getGroup } from './get-group'
 import { getGroups } from './get-groups'
 import { getHeadlines, getPoliticsHeadlines } from './get-headlines'
 import { getLeaderboard } from './get-leaderboard'
-import { getLeagues } from './get-leagues'
 import { getManaSupply } from './get-mana-supply'
 import { getManagrams } from './get-managrams'
 import { getMarket } from './get-market'
@@ -184,7 +183,6 @@ import {
 import { getMarketProps } from './get-market-props'
 import { getPosts } from './get-posts'
 import { getReactions } from './get-reactions'
-import { getSeasonInfo } from './get-season-info'
 import { getShopItems } from './get-shop-items'
 import { getShopStats } from './get-shop-stats'
 import { getSiteActivity } from './get-site-activity'
@@ -284,7 +282,6 @@ export const handlers: { [k in APIPath]: APIHandler<k> } = {
   'market/:contractId/unblock': unblockMarket,
   'get-user-limit-orders-with-contracts': getUserLimitOrdersWithContracts,
   'get-interesting-groups-from-views': getInterestingGroupsFromViews,
-  leagues: getLeagues,
   markets: getMarkets,
   'search-markets': searchMarketsLite,
   'search-markets-full': searchMarketsFull,
@@ -406,7 +403,6 @@ export const handlers: { [k in APIPath]: APIHandler<k> } = {
   'save-market-draft': saveMarketDraft,
   'get-market-drafts': getMarketDrafts,
   'delete-market-draft': deleteMarketDraft,
-  'get-season-info': getSeasonInfo,
   'mark-notification-read': markNotificationRead,
   'mark-notifications-read': markNotificationsRead,
   'dismiss-user-report': dismissUserReport,

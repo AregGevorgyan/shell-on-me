@@ -1,8 +1,6 @@
 import clsx from 'clsx'
 import { User } from 'common/user'
 import { Row } from 'web/components/layout/row'
-import { QuestsOrStreak } from 'web/components/home/quests-or-streak'
-import { DailyLeagueStat } from './daily-league-stat'
 import { DailyPredictleStat } from './daily-predictle-stat'
 import { DailyProfit } from './daily-profit'
 import { DailyLoan } from './daily-loan'
@@ -17,8 +15,6 @@ export function DailyStats(props: {
   const { user, className } = props
   return (
     <Row className={clsx('items-center gap-2 sm:gap-3', className)}>
-      <QuestsOrStreak user={user} />
-      <DailyLeagueStat userId={user?.id} />
       <DailyPredictleStat />
       <DailyProfit user={user} />
       {user && <DailyLoan user={user} />}

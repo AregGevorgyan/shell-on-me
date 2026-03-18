@@ -27,7 +27,6 @@ import { useAPIGetter } from 'web/hooks/use-api-getter'
 import { Button } from 'web/components/buttons/button'
 import { buildArray } from 'common/util/array'
 import { getCurrentPortfolio } from 'common/supabase/portfolio-metrics'
-import Link from 'next/link'
 
 const LEADERBOARD_TYPES = [
   { name: 'Profit', value: 'profit' },
@@ -199,12 +198,6 @@ export default function Leaderboards() {
             <h1 className="text-primary-700 text-2xl font-semibold">
               Leaderboard
             </h1>
-            <Link
-              href="/leagues"
-              className="text-ink-500 hover:text-ink-700 text-sm"
-            >
-              Monthly leagues →
-            </Link>
           </Row>
           <p className="text-ink-500 text-sm">
             All-time top traders on Manifold

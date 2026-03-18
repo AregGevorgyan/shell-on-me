@@ -86,11 +86,8 @@ export type User = {
   referredByGroupId?: string
   shouldShowWelcome?: boolean
   lastBetTime?: number
-  currentBettingStreak?: number
-  streakForgiveness: number
   hasSeenLoanModal?: boolean
   hasSeenContractFollowModal?: boolean
-  seenStreakModal?: boolean
   /** @deprecated Use user_bans table instead */
   isBannedFromPosting?: boolean
   /** @deprecated Use user_bans table instead */

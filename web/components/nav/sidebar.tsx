@@ -14,7 +14,6 @@ import {
 // import { PiTelevisionSimple } from 'react-icons/pi'
 import clsx from 'clsx'
 import { useState } from 'react'
-import TrophyIcon from 'web/lib/icons/trophy-icon.svg'
 
 import { buildArray } from 'common/util/array'
 import { DAY_MS } from 'common/util/time'
@@ -165,7 +164,6 @@ const getDesktopNav = (
         href: `/notifications`,
         icon: NotificationsIcon,
       },
-      { name: 'Leagues', href: '/leagues', icon: TrophyIcon },
       {
         name: 'Forum',
         href: '/posts',
@@ -208,7 +206,6 @@ const getMobileNav = (
   const { isAdminOrMod, isLiveTV } = options
 
   return buildArray<NavItem>(
-    { name: 'Leagues', href: '/leagues', icon: TrophyIcon },
     { name: 'Forum', href: '/posts', icon: ChatIcon },
     { name: 'Charity', href: '/charity', icon: HeartIcon },
     loggedIn && {

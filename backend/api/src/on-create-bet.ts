@@ -6,13 +6,12 @@ import {
 } from 'shared/utils'
 import { Bet, LimitBet } from 'common/bet'
 import { Contract } from 'common/contract'
-import { humanish, User } from 'common/user'
+import { User } from 'common/user'
 import { groupBy, sortBy, sumBy } from 'lodash'
 import { filterDefined } from 'common/util/array'
 import {
   createBetFillNotification,
   createBetReplyToCommentNotification,
-  createBettingStreakBonusNotification,
   createFollowSuggestionNotification,
   createLimitBetCanceledNotification,
   createNewBettorNotification,
@@ -21,21 +20,15 @@ import {
   createSupabaseDirectClient,
   SupabaseDirectClient,
 } from 'shared/supabase/init'
-import { addToLeagueIfNotInOne } from 'shared/generate-leagues'
 import { getCommentSafe } from 'shared/supabase/contract-comments'
 import { getBetsRepliedToComment } from 'shared/supabase/bets'
 import { updateData } from 'shared/supabase/utils'
 import {
-  BETTING_STREAK_BONUS_AMOUNT,
-  BETTING_STREAK_BONUS_MAX,
   MAX_TRADERS_FOR_BIG_BONUS,
   SMALL_UNIQUE_BETTOR_LIQUIDITY,
   UNIQUE_BETTOR_LIQUIDITY,
 } from 'common/economy'
-import { BettingStreakBonusTxn, UniqueBettorBonusTxn } from 'common/txn'
-import { getBenefit, SUPPORTER_ENTITLEMENT_IDS } from 'common/supporter-config'
-import { convertEntitlement } from 'common/shop/types'
-import { runTxnFromBank } from 'shared/txn/run-txn'
+import { UniqueBettorBonusTxn } from 'common/txn'
 import { Answer } from 'common/answer'
 import {
   addHouseSubsidy,
@@ -71,7 +64,6 @@ export const onCreateBets = async (result: ExecuteNewBetResult) => {
     cancelledLimitOrders,
     makers,
     updatedMakers,
-    streakIncremented,
     bonusTxn: creatorBonusTxn,
     reloadMetrics,
     userUpdates,
@@ -86,9 +78,6 @@ export const onCreateBets = async (result: ExecuteNewBetResult) => {
   broadcastUpdatedUser(
     removeUndefinedProps({
       id: originalBettor.id,
-      currentBettingStreak: streakIncremented
-        ? (originalBettor?.currentBettingStreak ?? 0) + 1
-        : undefined,
       lastBetTime: bets[0].createdTime,
     })
   )
@@ -178,7 +167,7 @@ export const onCreateBets = async (result: ExecuteNewBetResult) => {
     (b) => b.createdTime
   )
 
-  // We only update the following (streaks, etc.) for non-redemption, non-api bets
+  // We only update the following for non-redemption, non-api bets
   if (nonRedemptionNonApiBets.length === 0) return
 
   const earliestBet = nonRedemptionNonApiBets[0]
@@ -190,8 +179,6 @@ export const onCreateBets = async (result: ExecuteNewBetResult) => {
         contract,
         pg
       )),
-    streakIncremented &&
-      (await payBettingStreak(originalBettor, earliestBet, contract)),
     replyBet &&
       (await handleBetReplyToComment(replyBet, contract, originalBettor, pg)),
     creatorBonusTxn &&
@@ -204,7 +191,6 @@ export const onCreateBets = async (result: ExecuteNewBetResult) => {
         creatorBonusTxn,
         nonRedemptionNonApiBets
       ),
-    addToLeagueIfNotInOne(pg, originalBettor.id),
   ])
 }
 
@@ -272,81 +258,6 @@ const handleBetReplyToComment = async (
   )
 }
 
-const payBettingStreak = async (
-  oldUser: User,
-  bet: Bet,
-  contract: Contract
-) => {
-  const pg = createSupabaseDirectClient()
-  const result = await pg.tx(async (tx) => {
-    const newBettingStreak = (oldUser.currentBettingStreak ?? 0) + 1
-    if (!humanish(oldUser)) {
-      return {
-        bonusAmount: 0,
-        sweepsBonusAmount: 0,
-        newBettingStreak,
-        txn: { id: bet.id },
-        sweepsTxn: null,
-      }
-    }
-
-    // Fetch user's supporter entitlements for bonus multiplier
-    const supporterEntitlementRows = await tx.manyOrNone(
-      `SELECT user_id, entitlement_id, granted_time, expires_time, enabled FROM user_entitlements
-       WHERE user_id = $1
-       AND entitlement_id = ANY($2)
-       AND enabled = true
-       AND (expires_time IS NULL OR expires_time > NOW())`,
-      [oldUser.id, SUPPORTER_ENTITLEMENT_IDS]
-    )
-
-    // Convert to UserEntitlement format for getBenefit
-    const entitlements = supporterEntitlementRows.map(convertEntitlement)
-
-    // Get tier-specific quest multiplier (1x for non-supporters)
-    const questMultiplier = getBenefit(entitlements, 'questMultiplier')
-
-    // Send them the bonus times their streak, with supporter multiplier
-    const baseBonus = Math.min(
-      BETTING_STREAK_BONUS_AMOUNT * newBettingStreak,
-      BETTING_STREAK_BONUS_MAX
-    )
-    const bonusAmount = Math.floor(baseBonus * questMultiplier)
-
-    const bonusTxnDetails = {
-      currentBettingStreak: newBettingStreak,
-      contractId: contract.id,
-      supporterBonus: questMultiplier > 1,
-      questMultiplier,
-    }
-
-    const bonusTxn: Omit<
-      BettingStreakBonusTxn,
-      'id' | 'createdTime' | 'fromId'
-    > = {
-      fromType: 'BANK',
-      toId: oldUser.id,
-      toType: 'USER',
-      amount: bonusAmount,
-      token: 'M$',
-      category: 'BETTING_STREAK_BONUS',
-      data: bonusTxnDetails,
-    }
-
-    const txn = await runTxnFromBank(tx, bonusTxn)
-
-    return { txn, bonusAmount, newBettingStreak }
-  })
-
-  await createBettingStreakBonusNotification(
-    oldUser,
-    result.txn.id,
-    bet,
-    contract,
-    result.bonusAmount,
-    result.newBettingStreak
-  )
-}
 
 export const sendUniqueBettorNotificationToCreator = async (
   contract: Contract,

@@ -17,7 +17,6 @@ import {
   createSupabaseClient,
   createSupabaseDirectClient,
 } from 'shared/supabase/init'
-import { DIVISION_NAMES } from 'common/leagues'
 import * as numeral from 'numeral'
 import { getContractsDirect } from 'shared/supabase/contracts'
 
@@ -83,17 +82,6 @@ export async function sendPortfolioUpdateEmailsToAllUsers() {
     (r) => (usersToLikesReceived[r.content_owner_id] = r.count)
   )
 
-  const usersToLeagueStats = {} as { [userId: string]: string | null }
-  await pg.map(
-    `select distinct on (user_id) * from user_league_info
-       where user_id = any($1)
-       order by user_id, created_time desc;`,
-    [userIds],
-    (r) =>
-      (usersToLeagueStats[r.user_id] = r
-        ? numeral(r.rank).format('0o') + ' in ' + DIVISION_NAMES[r.division]
-        : null)
-  )
   // TODO: use their saved weekly portfolio update object from weekly-portfolio-updates.ts
   const usersToContractMetrics = await getUsersContractMetricsOrderedByProfit(
     userIds,
@@ -134,8 +122,6 @@ export async function sendPortfolioUpdateEmailsToAllUsers() {
       likes_received: (usersToLikesReceived[privateUser.id] ?? 0).toString(),
       unique_bettors: privateUser.weeklyTraders.toString(),
       markets_traded: totalContractsUserBetOnInLastWeek.toString(),
-      prediction_streak: privateUser.currentBettingStreak.toString() + ' days',
-      league_rank: usersToLeagueStats[privateUser.id] ?? 'Unranked',
     } as OverallPerformanceData
 
     const weeklyMoverContracts = filterDefined(

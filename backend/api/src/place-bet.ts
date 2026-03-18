@@ -52,7 +52,6 @@ import {
 import {
   broadcastUserUpdates,
   bulkIncrementBalancesQuery,
-  incrementStreakQuery,
   UserUpdate,
 } from 'shared/supabase/users'
 import { bulkUpdateQuery, updateDataQuery } from 'shared/supabase/utils'
@@ -393,7 +392,6 @@ export const executeNewBetResult = async (
       fullBets: [convertBet(betRow)],
       user,
       betGroupId,
-      streakIncremented: false,
       updatedMetrics: [],
       bonusTxn: undefined,
       userUpdates: undefined,
@@ -600,7 +598,6 @@ export const executeNewBetResult = async (
     return !existingMetric || !isEqual(existingMetric, m)
   })
   const metricsQuery = bulkUpdateContractMetricsQuery(newMetrics)
-  const streakIncrementedQuery = incrementStreakQuery(user, newBet.createdTime)
   const contractUpdateQuery = updateDataQuery('contracts', 'id', contractUpdate)
   const answerUpdateQuery = bulkUpdateQuery(
     'answers',
@@ -613,14 +610,13 @@ export const executeNewBetResult = async (
   const results = await pgTrans.multi(
     `
     ${userBalanceUpdatesQuery}; --0
-    ${streakIncrementedQuery}; --1
-    ${insertBetsQuery}; --2
-    ${metricsQuery}; --3
-    ${contractUpdateQuery}; --4
-    ${answerUpdateQuery}; --5
-    ${cancelLimitsQuery}; --6
-    ${bulkUpdateLimitOrdersQuery}; --7
-    ${bonusTxnQuery}; --8
+    ${insertBetsQuery}; --1
+    ${metricsQuery}; --2
+    ${contractUpdateQuery}; --3
+    ${answerUpdateQuery}; --4
+    ${cancelLimitsQuery}; --5
+    ${bulkUpdateLimitOrdersQuery}; --6
+    ${bonusTxnQuery}; --7
      `
   )
   log(`placeBet bulk insert/update took ${Date.now() - startTime}ms`)
@@ -635,9 +631,8 @@ export const executeNewBetResult = async (
       }
     }
   }
-  const streakIncremented = results[1][0].streak_incremented
-  const newContract = results[4].map(convertContract)[0]
-  const bonusTxn = first(results[8].map(convertTxn)) as
+  const newContract = results[3].map(convertContract)[0]
+  const bonusTxn = first(results[7].map(convertTxn)) as
     | UniqueBettorBonusTxn
     | undefined
 
@@ -657,7 +652,6 @@ export const executeNewBetResult = async (
     fullBets: insertedBets,
     user,
     betGroupId,
-    streakIncremented,
     bonusTxn,
     updatedMetrics: bettorRedemptionUpdatedMetrics,
     answerUpdates,

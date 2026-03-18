@@ -52,13 +52,11 @@ export type PerContractInvestmentsData = {
 
 export type OverallPerformanceData = {
   profit: string
-  prediction_streak: string
   markets_traded: string
   profit_style: string
   likes_received: string
   markets_created: string
   unique_bettors: string
-  league_rank: string
 }
 
 export const formatMoneyEmail = (

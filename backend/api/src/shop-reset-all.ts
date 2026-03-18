@@ -52,18 +52,6 @@ export const shopResetAll: APIHandler<'shop-reset-all'> = async (_, auth) => {
       [auth.uid]
     )
 
-    // Reset streak forgiveness to 0
-    await tx.none(
-      `UPDATE users
-       SET data = jsonb_set(
-         COALESCE(data, '{}'),
-         '{streakForgiveness}',
-         '0'
-       )
-       WHERE id = $1`,
-      [auth.uid]
-    )
-
     return { success: true as const, refundedAmount: totalRefund }
   })
 

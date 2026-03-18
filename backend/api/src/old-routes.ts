@@ -15,7 +15,6 @@ import { saveTopic } from './save-topic'
 import { boostmarket } from './boost-market'
 import { redeemboost } from './redeem-market-ad-reward'
 import { followtopic } from './follow-topic'
-import { leagueActivity } from './league-activity'
 import { updategroup } from './update-group'
 import { updateUserDisinterestEmbedding } from 'api/update-user-disinterests'
 import { cancelbounty } from './cancel-bounty'
@@ -78,7 +77,6 @@ export const addOldRoutes = (app: express.Application) => {
   app.post('/redeem-boost', ...apiRoute(redeemboost))
 
   app.post('/follow-topic', ...apiRoute(followtopic))
-  app.post('/league-activity', ...apiRoute(leagueActivity))
   app.post('/cancel-bounty', ...apiRoute(cancelbounty))
   app.post('/edit-answer-cpmm', ...apiRoute(editanswercpmm))
   app.post('/searchgiphy', ...apiRoute(searchgiphy))

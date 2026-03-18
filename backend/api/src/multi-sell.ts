@@ -235,7 +235,6 @@ const multiSellMain: APIHandler<'multi-sell'> = async (props, auth) => {
       user,
       cancelledLimitOrders,
       makers,
-      streakIncremented: results.some((b) => b.streakIncremented),
       bonusTxn: results.find((r) => r.bonusTxn)?.bonusTxn,
       reloadMetrics: true,
       updatedMetrics: [],

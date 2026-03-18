@@ -2,7 +2,6 @@ import { Bet } from 'common/bet'
 import { ContractToken, OutcomeType } from 'common/contract'
 import { groupBy } from 'lodash'
 import { groupPath } from './group'
-import { league_user_info } from './leagues'
 import { PAST_BET } from './user'
 import { notification_preference } from './user-notification-preferences'
 
@@ -61,8 +60,6 @@ export type notification_source_types =
   | 'group'
   | 'user'
   | 'bonus' // strictly unique bettor bonuses atm
-  | 'betting_streak_bonus'
-  | 'betting_streak_expiring'
   | 'loan'
   | 'tip_and_like'
   | 'badge'
@@ -70,8 +67,6 @@ export type notification_source_types =
   | 'comment_like'
   | 'contract_like'
   | 'weekly_portfolio_update'
-  | 'quest_reward'
-  | 'league_change'
   | 'bounty_added'
   | 'mana_payment'
   | 'referral_program'
@@ -117,7 +112,6 @@ export type notification_reason_types =
   | 'bet_fill'
   | 'limit_order_cancelled'
   | 'user_joined_from_your_group_invite'
-  | 'betting_streak_incremented'
   | 'loan_income'
   | 'comment_on_your_contract'
   | 'answer_on_your_contract'
@@ -164,17 +158,9 @@ export const NOTIFICATION_DESCRIPTIONS: notification_descriptions = {
     detailed: 'Comments on your own questions',
     verb: 'commented on your market',
   },
-  betting_streaks: {
-    simple: `Prediction streak bonuses & expirations`,
-    detailed: `Bonuses and expiration notices for prediction streaks made over consecutive days`,
-  },
   all_answers_on_watched_markets: {
     simple: 'All new answers',
     detailed: "All new answers on questions you're watching",
-  },
-  quest_payout: {
-    simple: `Quest completion rewards`,
-    detailed: `Bonuses paid out for completing quests`,
   },
   contract_from_followed_user: {
     simple: 'New questions from users you follow',
@@ -226,10 +212,6 @@ export const NOTIFICATION_DESCRIPTIONS: notification_descriptions = {
     simple: 'A user tagged you',
     detailed: 'When another use tags you',
     verb: 'tagged you',
-  },
-  league_changed: {
-    simple: 'Your league changed',
-    detailed: 'When you join, move up, or move down a league',
   },
   thank_you_for_purchases: {
     simple: 'Thank you notes for your purchases',
@@ -373,17 +355,6 @@ export const NOTIFICATION_DESCRIPTIONS: notification_descriptions = {
     detailed: 'All new comments on posts you follow',
     verb: 'commented',
   },
-}
-
-export type BettingStreakData = {
-  streak: number
-  bonusAmount: number
-  cashAmount?: number
-}
-export type LeagueChangeData = {
-  previousLeague: league_user_info | undefined
-  newLeague: { season: number; division: number; cohort: string }
-  bonusAmount: number
 }
 
 export type BetFillData = {
@@ -553,7 +524,6 @@ export const ReactionNotificationTypes: Partial<notification_source_types>[] = [
 export const BalanceChangeNotificationTypes: NotificationReason[] = [
   'loan_income',
   // bonuses
-  'betting_streak_incremented',
   'unique_bettors_on_your_contract',
   // resolutions
   'resolution_on_contract_with_users_shares_in',

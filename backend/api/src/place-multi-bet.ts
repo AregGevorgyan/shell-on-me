@@ -124,7 +124,6 @@ export const placeMultiBetMain = async (
       cancelledLimitOrders,
       makers,
       updatedMakers,
-      streakIncremented: results.some((r) => r.streakIncremented),
       bonusTxn: results.find((r) => r.bonusTxn)?.bonusTxn,
       reloadMetrics: true,
       updatedMetrics: [],

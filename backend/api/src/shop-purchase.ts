@@ -13,7 +13,6 @@ import { convertEntitlement, UserEntitlement } from 'common/shop/types'
 import {
   SUPPORTER_ENTITLEMENT_IDS,
   getBenefit,
-  getMaxStreakFreezes,
 } from 'common/supporter-config'
 import { DAY_MS } from 'common/util/time'
 
@@ -51,31 +50,6 @@ export const shopPurchase: APIHandler<'shop-purchase'> = async (
       )
       if (existingEntitlement) {
         throw new APIError(403, 'You already own this item')
-      }
-    }
-
-    // Check streak freeze purchase cap based on supporter tier
-    if (itemId === 'streak-forgiveness') {
-      // Fetch user's supporter entitlements to determine max capacity
-      const supporterEntitlements = await tx.manyOrNone(
-        `SELECT * FROM user_entitlements
-         WHERE user_id = $1
-         AND entitlement_id = ANY($2)
-         AND enabled = true
-         AND (expires_time IS NULL OR expires_time > NOW())`,
-        [auth.uid, [...SUPPORTER_ENTITLEMENT_IDS]]
-      )
-      const entitlements = supporterEntitlements.map(convertEntitlement)
-      const maxFreezes = getMaxStreakFreezes(entitlements)
-
-      // Get current streak freeze count
-      const currentFreezes = user.streakForgiveness ?? 0
-
-      if (currentFreezes >= maxFreezes) {
-        throw new APIError(
-          403,
-          `MAX OWNED - You have ${currentFreezes}/${maxFreezes} streak freezes (your tier's maximum)`
-        )
       }
     }
 
@@ -296,20 +270,6 @@ export const shopPurchase: APIHandler<'shop-purchase'> = async (
     // Find the one we just created/updated for backwards compatibility
     if (item.type !== 'instant') {
       entitlement = entitlements.find((e) => e.entitlementId === entitlementId)
-    }
-
-    // Item-specific effects
-    if (itemId === 'streak-forgiveness') {
-      await tx.none(
-        `UPDATE users
-         SET data = jsonb_set(
-           COALESCE(data, '{}'),
-           '{streakForgiveness}',
-           to_jsonb(COALESCE((data->>'streakForgiveness')::int, 0) + 1)
-         )
-         WHERE id = $1`,
-        [auth.uid]
-      )
     }
 
     return { success: true as const, entitlement, entitlements, upgradeCredit }

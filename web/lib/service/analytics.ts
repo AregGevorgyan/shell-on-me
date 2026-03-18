@@ -3,8 +3,7 @@ import { db } from 'web/lib/supabase/db'
 import { removeUndefinedProps } from 'common/util/object'
 import { getIsNative } from '../native/is-native'
 import { ShareEvent } from 'common/events'
-import { api, completeQuest } from 'web/lib/api/api'
-import { QuestType } from 'common/quest'
+import { api } from 'web/lib/api/api'
 import { run, SupabaseClient } from 'common/supabase/utils'
 import { Json } from 'common/supabase/schema'
 
@@ -89,7 +88,6 @@ export async function trackShareEvent(
     ...shareEventData,
     ...eventProperties,
   })
-  completeQuest({ questType: 'SHARES' as QuestType }).catch(() => {})
 }
 
 function insertUserEvent(

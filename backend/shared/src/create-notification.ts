@@ -3,13 +3,10 @@ import { Bet, LimitBet } from 'common/bet'
 import { ContractComment } from 'common/comment'
 import { Contract, MarketContract, PollContract } from 'common/contract'
 import { ContractMetric } from 'common/contract-metric'
-import { LeagueChangeNotificationData } from 'common/leagues'
 import {
   BetFillData,
   BetReplyNotificationData,
-  BettingStreakData,
   ContractResolutionData,
-  LeagueChangeData,
   MarketMovementData,
   Notification,
   notification_reason_types,
@@ -19,10 +16,9 @@ import {
   UniqueBettorData,
 } from 'common/notification'
 import { answerToMidpoint, getRangeContainingValues } from 'common/number'
-import { QuestType } from 'common/quest'
 import { convertBet } from 'common/supabase/bets'
 import { convertPrivateUser, convertUser } from 'common/supabase/users'
-import { QuestRewardTxn, UniqueBettorBonusTxn } from 'common/txn'
+import { UniqueBettorBonusTxn } from 'common/txn'
 import {
   MANIFOLD_AVATAR_URL,
   MANIFOLD_USER_NAME,
@@ -414,173 +410,6 @@ export const createManaPaymentNotification = async (
   }
   const pg = createSupabaseDirectClient()
   await insertNotificationToSupabase(notification, pg)
-}
-
-export const createBettingStreakBonusNotification = async (
-  user: User,
-  txnId: string,
-  bet: Bet,
-  contract: Contract,
-  amount: number,
-  streak: number
-) => {
-  const privateUser = await getPrivateUser(user.id)
-  if (!privateUser) return
-  const { sendToBrowser } = getNotificationDestinationsForUser(
-    privateUser,
-    'betting_streaks'
-  )
-  if (!sendToBrowser) return
-
-  const notification: Notification = {
-    id: nanoid(6),
-    userId: user.id,
-    reason: 'betting_streaks',
-    createdTime: Date.now(),
-    isSeen: false,
-    sourceId: txnId,
-    sourceType: 'betting_streak_bonus',
-    sourceUpdateType: 'created',
-    sourceUserName: user.name,
-    sourceUserUsername: user.username,
-    sourceUserAvatarUrl: user.avatarUrl,
-    sourceText: amount.toString(),
-    sourceSlug: `/${contract.creatorUsername}/${contract.slug}/bets/${bet.id}`,
-    sourceTitle: 'Betting Streak Bonus',
-    sourceContractSlug: contract.slug,
-    sourceContractId: contract.id,
-    sourceContractTitle: contract.question,
-    sourceContractCreatorUsername: contract.creatorUsername,
-    data: {
-      streak: streak,
-      bonusAmount: amount,
-      cashAmount: 0,
-    } as BettingStreakData,
-  }
-  const pg = createSupabaseDirectClient()
-  await insertNotificationToSupabase(notification, pg)
-}
-
-export const createBettingStreakExpiringNotification = async (
-  idsAndStreaks: [string, number][],
-  pg: SupabaseDirectClient
-) => {
-  const privateUsers = await pg.map(
-    `select * from private_users where id = any($1)`,
-    [idsAndStreaks.map(([id]) => id)],
-    convertPrivateUser
-  )
-  const bulkPushNotifications: [PrivateUser, Notification, string, string][] =
-    []
-  const bulkNotifications: Notification[] = []
-  forEach(idsAndStreaks, async ([userId, streak]) => {
-    const privateUser = privateUsers.find((user) => user.id === userId)
-    if (!privateUser) return
-    const { sendToBrowser, sendToMobile } = getNotificationDestinationsForUser(
-      privateUser,
-      'betting_streaks'
-    )
-    const id = nanoid(6)
-    const notification: Notification = {
-      id,
-      userId,
-      reason: 'betting_streaks',
-      createdTime: Date.now(),
-      isSeen: false,
-      sourceId: id,
-      sourceText: streak.toString(),
-      sourceType: 'betting_streak_expiring',
-      sourceUpdateType: 'created',
-      sourceUserName: '',
-      sourceUserUsername: '',
-      sourceUserAvatarUrl: '',
-      sourceTitle: 'Betting Streak Expiring',
-      data: {
-        streak: streak,
-      } as BettingStreakData,
-    }
-    if (sendToMobile) {
-      bulkPushNotifications.push([
-        privateUser,
-        notification,
-        `${streak} day streak expiring!`,
-        'Place a prediction in the next 3 hours to keep it.',
-      ])
-    }
-    if (sendToBrowser) {
-      bulkNotifications.push(notification)
-    }
-  })
-  await createPushNotifications(bulkPushNotifications)
-  await bulkInsertNotifications(bulkNotifications, pg)
-}
-
-export const createLeagueChangedNotifications = async (
-  pg: SupabaseDirectClient,
-  data: LeagueChangeNotificationData[]
-) => {
-  if (data.length === 0) return
-
-  log(`Creating ${data.length} league change notifications.`)
-
-  const userIds = data.map((d) => d.userId)
-
-  // Fetch all relevant private users in bulk
-  const privateUsers = await pg.map(
-    `select * from private_users where id = any($1)`,
-    [userIds],
-    convertPrivateUser
-  )
-  const privateUserMap = new Map(privateUsers.map((user) => [user.id, user]))
-
-  const bulkNotifications: Notification[] = []
-
-  for (const item of data) {
-    const privateUser = privateUserMap.get(item.userId)
-    if (!privateUser) {
-      log(`Could not find private user ${item.userId}`)
-      continue
-    }
-
-    // Check notification preferences
-    const { sendToBrowser } = getNotificationDestinationsForUser(
-      privateUser,
-      'league_changed'
-    )
-    if (!sendToBrowser) continue
-
-    // Construct notification data
-    const id = nanoid(6) // Still need a unique ID per notification
-    const notificationData: LeagueChangeData = {
-      previousLeague: item.previousLeague,
-      newLeague: item.newLeague,
-      bonusAmount: item.bonusAmount,
-    }
-
-    const notification: Notification = {
-      id,
-      userId: item.userId,
-      reason: 'league_changed',
-      createdTime: Date.now(),
-      isSeen: false,
-      sourceId: id, // Use the generated id as sourceId for uniqueness? Or maybe season identifier? Let's use id for now.
-      sourceText: item.bonusAmount.toString(),
-      sourceType: 'league_change',
-      sourceUpdateType: 'created',
-      sourceUserName: '', // Not relevant for this type
-      sourceUserUsername: '', // Not relevant for this type
-      sourceUserAvatarUrl: '', // Not relevant for this type
-      data: notificationData,
-    }
-    bulkNotifications.push(notification)
-  }
-
-  if (bulkNotifications.length > 0) {
-    await bulkInsertNotifications(bulkNotifications, pg)
-    log(`Inserted ${bulkNotifications.length} league change notifications.`)
-  } else {
-    log('No league change notifications met filter criteria.')
-  }
 }
 
 export const createNewBettorNotification = async (
@@ -976,44 +805,6 @@ export const createWeeklyPortfolioUpdateNotification = async (
       weeklyProfit,
       rangeEndDateSlug,
     },
-  }
-  const pg = createSupabaseDirectClient()
-  await insertNotificationToSupabase(notification, pg)
-}
-
-export const createQuestPayoutNotification = async (
-  user: User,
-  txnId: string,
-  payoutAmount: number,
-  questCount: number,
-  questType: QuestType
-) => {
-  const privateUser = await getPrivateUser(user.id)
-  if (!privateUser) return
-  const { sendToBrowser } = getNotificationDestinationsForUser(
-    privateUser,
-    'quest_payout'
-  )
-  if (!sendToBrowser) return
-
-  const notification: Notification = {
-    id: txnId,
-    userId: user.id,
-    reason: 'quest_payout',
-    createdTime: Date.now(),
-    isSeen: false,
-    sourceId: txnId,
-    sourceType: 'quest_reward',
-    sourceUpdateType: 'created',
-    sourceUserName: user.name,
-    sourceUserUsername: user.username,
-    sourceUserAvatarUrl: user.avatarUrl,
-    sourceText: payoutAmount.toString(),
-    sourceTitle: 'Quests',
-    data: {
-      questType,
-      questCount,
-    } as QuestRewardTxn['data'],
   }
   const pg = createSupabaseDirectClient()
   await insertNotificationToSupabase(notification, pg)

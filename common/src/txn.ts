@@ -1,8 +1,6 @@
 // A txn (pronounced "texan") respresents a payment between two ids on Manifold
 // Shortened from "transaction" to distinguish from Firebase transactions (and save chars)
 
-import { QuestType } from 'common/quest'
-import { league_user_info } from './leagues'
 
 type AnyTxnType =
   | Donation
@@ -12,7 +10,6 @@ type AnyTxnType =
   | Manalink
   | Referral
   | UniqueBettorBonus
-  | BettingStreakBonus
   | CancelUniqueBettorBonus
   | CharityFee
   | SignupBonus
@@ -29,10 +26,8 @@ type AnyTxnType =
   | MarketAdCreate
   | MarketAdRedeem
   | MarketAdRedeemFee
-  | QuestReward
   | QAndACreate
   | QAndAAward
-  | LeaguePrize
   | BountyPosted
   | BountyAwarded
   | BountyAdded
@@ -137,16 +132,6 @@ type UniqueBettorBonus = {
     // Old unique bettor bonus txns stored all unique bettor ids
     uniqueBettorIds?: string[]
     isPartner: boolean
-  }
-}
-
-type BettingStreakBonus = {
-  fromType: 'BANK'
-  toType: 'USER'
-  category: 'BETTING_STREAK_BONUS'
-  data: {
-    currentBettingStreak?: number
-    contractId?: string
   }
 }
 
@@ -334,16 +319,6 @@ type MarketAdRedeemFee = {
   toType: 'BANK'
 }
 
-type QuestReward = {
-  category: 'QUEST_REWARD'
-  fromType: 'BANK'
-  toType: 'USER'
-  data: {
-    questType: QuestType
-    questCount: number
-  }
-}
-
 type QAndACreate = {
   category: 'Q_AND_A_CREATE'
   fromType: 'USER'
@@ -360,13 +335,6 @@ type QAndAAward = {
   data: {
     q_and_a_id: string
   }
-}
-
-type LeaguePrize = {
-  category: 'LEAGUE_PRIZE'
-  fromType: 'BANK'
-  toType: 'USER'
-  data: league_user_info
 }
 
 type BountyPosted = {
@@ -602,7 +570,6 @@ export type DonationTxn = Txn & Donation
 export type TipTxn = Txn & Tip
 export type ManalinkTxn = Txn & Manalink
 export type ReferralTxn = Txn & Referral
-export type BettingStreakBonusTxn = Txn & BettingStreakBonus
 export type UniqueBettorBonusTxn = Txn & UniqueBettorBonus
 export type CancelUniqueBettorBonusTxn = Txn & CancelUniqueBettorBonus
 export type CharityFeeTxn = Txn & CharityFee
@@ -623,11 +590,9 @@ export type PostAdRedeemTxn = Txn & PostAdRedeem
 export type MarketAdCreateTxn = Txn & MarketAdCreate
 export type MarketAdRedeemTxn = Txn & MarketAdRedeem
 export type MarketAdRedeemFeeTxn = Txn & MarketAdRedeemFee
-export type QuestRewardTxn = Txn & QuestReward
 export type LootBoxPurchaseTxn = Txn & LootBoxPurchase
 export type QAndACreateTxn = Txn & QAndACreate
 export type QAndAAwardTxn = Txn & QAndAAward
-export type LeaguePrizeTxn = Txn & LeaguePrize
 export type BountyAwardedTxn = Txn & BountyAwarded
 export type BountyPostedTxn = Txn & BountyPosted
 export type BountyAddedTxn = Txn & BountyAdded

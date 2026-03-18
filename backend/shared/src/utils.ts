@@ -305,7 +305,6 @@ export const getPrivateUsersNotSent = async (
     `select pu.data, u.name,
        u.created_time,
        coalesce(((u.data->'creatorTraders'->>'weekly')::bigint),0) as weekly_traders,
-       coalesce(((u.data->>'currentBettingStreak')::bigint),0) as current_betting_streak
          from private_users pu
          join users u on pu.id = u.id
          where (pu.data->'notificationPreferences'->>'${preference}')::jsonb @> '["email"]'
@@ -323,7 +322,6 @@ export const getPrivateUsersNotSent = async (
       createdTime: tsToMillis(row.created_time as string),
       name: row.name as string,
       weeklyTraders: row.weekly_traders as number,
-      currentBettingStreak: row.current_betting_streak as number,
     })
   )
 }
@@ -359,20 +357,3 @@ export async function getTrendingContractsToEmail() {
   )
 }
 
-export const getBettingStreakResetTimeBeforeNow = () => {
-  // Get current time in Pacific
-  const now = dayjs().tz('America/Los_Angeles')
-
-  // Get today's reset time (midnight Pacific)
-  const todayResetTime = now.startOf('day')
-
-  // Get yesterday's reset time
-  const yesterdayResetTime = todayResetTime.subtract(1, 'day')
-
-  // Use yesterday's reset time if we haven't hit today's yet
-  const resetTime = (
-    now.isBefore(todayResetTime) ? yesterdayResetTime : todayResetTime
-  ).valueOf()
-  log('betting streak reset time', resetTime)
-  return resetTime
-}

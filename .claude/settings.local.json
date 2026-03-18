@@ -39,7 +39,10 @@
       "Bash(grep -rn \"CREATE TABLE\" \"/home/areg_/Code Ubuntu/shell-on-me/backend/supabase/\"*.sql)",
       "Bash(grep -rh 'create type\\\\|CREATE TYPE' *.sql)",
       "Bash(grep -rhn '_type\\\\|_enum' *.sql)",
-      "Bash(grep -rh 'status_type' *.sql)"
+      "Bash(grep -rh 'status_type' *.sql)",
+      "Bash(grep -l \"league\\\\|streak\" backend/scheduler/src/jobs/*.ts)",
+      "Bash(grep -E \"export.*league|league.*export\" backend/api/src/*.ts)",
+      "Bash(grep -E \"\\\\.\\(tsx|ts\\)$\")"
     ],
     "deny": [],
     "ask": []

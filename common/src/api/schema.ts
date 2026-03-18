@@ -22,7 +22,6 @@ import {
   SearchGroupShape,
   Topic,
 } from 'common/group'
-import { League } from 'common/leagues'
 import { type LinkPreview } from 'common/link-preview'
 import { LiquidityProvision } from 'common/liquidity-provision'
 import { CandidateBet } from 'common/new-bet'
@@ -895,20 +894,6 @@ export const API = (_apiTypeCheck = {
       })
       .strict(),
   },
-  leagues: {
-    method: 'GET',
-    visibility: 'public',
-    authed: false,
-    cache: DEFAULT_CACHE_STRATEGY,
-    returns: [] as League[],
-    props: z
-      .object({
-        userId: z.string().optional(),
-        cohort: z.string().optional(),
-        season: z.coerce.number().optional(),
-      })
-      .strict(),
-  },
   markets: {
     method: 'GET',
     visibility: 'public',
@@ -1129,7 +1114,6 @@ export const API = (_apiTypeCheck = {
       optOutBetWarnings: z.boolean().optional(),
       isAdvancedTrader: z.boolean().optional(),
       //internal
-      seenStreakModal: z.boolean().optional(),
       shouldShowWelcome: z.boolean().optional(),
       hasSeenContractFollowModal: z.boolean().optional(),
       hasSeenLoanModal: z.boolean().optional(),
@@ -2199,9 +2183,6 @@ export const API = (_apiTypeCheck = {
       totalReferrals: number
       totalReferredProfitMana: number
       totalVolumeMana: number
-      seasonsPlatinumOrHigher: number
-      seasonsDiamondOrHigher: number
-      seasonsMasters: number
       numberOfComments: number
       totalLiquidityCreatedMarkets: number
       totalTradesCount: number
@@ -2211,8 +2192,6 @@ export const API = (_apiTypeCheck = {
       unprofitableMarketsCount: number
       largestProfitableTradeValue: number
       largestUnprofitableTradeValue: number
-      longestBettingStreak: number
-      largestLeagueSeasonEarnings: number
       modTicketsResolved: number
       charityDonatedMana: number
       ranks: RanksType
@@ -2615,21 +2594,6 @@ export const API = (_apiTypeCheck = {
         id: z.coerce.number(),
       })
       .strict(),
-  },
-  'get-season-info': {
-    method: 'GET',
-    visibility: 'public',
-    authed: false,
-    cache: LIGHT_CACHE_STRATEGY,
-    props: z.object({
-      season: z.coerce.number().int().positive().optional(),
-    }),
-    returns: {} as {
-      season: number
-      startTime: number // epoch ms
-      endTime: number | null // epoch ms, null if a *mystery* for clients
-      status: 'active' | 'processing' | 'complete'
-    },
   },
   'mark-notification-read': {
     method: 'POST',

@@ -2,7 +2,7 @@ import { DAY_MS } from '../util/time'
 import { UserEntitlement } from './types'
 
 export type ShopItemType =
-  | 'instant' // Execute immediately (e.g., streak forgiveness)
+  | 'instant' // Execute immediately
   | 'time-limited' // Has expiration (e.g., 30-day badge)
   | 'permanent-toggleable' // Owned forever, can enable/disable (e.g., PAMPU skin)
 
@@ -112,15 +112,6 @@ export const SHOP_ITEMS: ShopItem[] = [
     type: 'permanent-toggleable',
     limit: 'one-time',
     category: 'avatar-overlay',
-  },
-  {
-    id: 'streak-forgiveness',
-    name: 'Streak Freeze',
-    description: 'Protect your betting streak - adds one forgiveness point',
-    price: 150,
-    type: 'instant',
-    limit: 'unlimited',
-    category: 'consumable',
   },
   {
     id: 'pampu-skin',
