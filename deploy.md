@@ -6,7 +6,7 @@
 |---|---|---|
 | Web | Vercel | https://shell-on-me-market.vercel.app — auto-deploys on push to `main` |
 | API | Render (free tier) | Docker, auto-deploys on push to `main` |
-| Scheduler | AWS ECS Fargate | Always-on, deploy via script |
+| Scheduler | Oracle Cloud Free Tier VM | Always-on Docker container, deploy via script |
 | Database | Supabase | Postgres, manual schema management |
 | Auth | Firebase | Google-only sign-in |
 
@@ -17,10 +17,10 @@ Install locally before deploying:
 - Bun `1.x`
 - Node.js `20+`
 - Docker
-- AWS CLI (`aws configure` with access to the StartupShell AWS account)
 - `firebase` CLI
 - `supabase` CLI (for schema changes)
 - Render account connected to this repo (one-time setup)
+- Oracle Cloud account (free tier) with an SSH key pair for the scheduler VM
 
 ## First-time infrastructure checklist
 
@@ -60,23 +60,33 @@ Schema lives in `backend/supabase/`. Apply SQL files carefully; back up before d
    - All backend secrets listed in the Environment variables section below
 4. In Render dashboard → Settings → Health & Alerts, set health check timeout to at least 60s
 
-### 5. AWS ECS Fargate — Scheduler
+### 5. Oracle Cloud Free Tier — Scheduler
 
-One-time setup in the AWS console:
+One-time VM setup:
 
-1. Create an ECR repository: `shell-scheduler-prod`
-2. Create an ECS cluster named `shell` (Fargate launch type)
-3. Create a task definition:
-   - Family: `shell-scheduler-prod`
-   - Launch type: Fargate
-   - CPU: 0.5 vCPU, Memory: 2GB
-   - Container image: `<account-id>.dkr.ecr.<region>.amazonaws.com/shell-scheduler-prod:latest`
-   - Environment variables: set `IS_PROD=true`, `NEXT_PUBLIC_FIREBASE_ENV=PROD`, `FIREBASE_PROJECT_ID`, `FIREBASE_SERVICE_ACCOUNT_KEY`, and all backend secrets listed in the Environment variables section below
-4. Create a service named `shell-scheduler-prod`:
-   - Desired count: 1
-   - No load balancer needed
+1. Sign in to [cloud.oracle.com](https://cloud.oracle.com) and navigate to **Compute → Instances → Create instance**.
+2. Choose the **Always Free** shape `VM.Standard.E2.1.Micro` (1/8 OCPU, 1 GB RAM). Ubuntu 22.04 is recommended. (The A1.Flex ARM shape is also always-free and preferable if capacity is available in your region, but E2.1.Micro is sufficient.)
+3. Upload your SSH public key during provisioning (or generate one in the console).
+4. After the instance is running, open port 80 in the VCN security list:
+   - **Networking → Virtual Cloud Networks → your VCN → Security Lists → Default**
+   - Add an **Ingress Rule**: Source CIDR `0.0.0.0/0`, Protocol TCP, Destination Port `80`.
+   - Also open the OS firewall on the VM: `sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT && sudo netfilter-persistent save`
+5. SSH into the VM and install Docker:
+   ```bash
+   sudo apt-get update
+   sudo apt-get install -y docker.io
+   sudo systemctl enable --now docker
+   sudo usermod -aG docker ubuntu
+   # log out and back in for group change to take effect
+   ```
+6. Create the env file on the VM at `/home/ubuntu/shell-scheduler.env` with the backend environment variables listed in the Environment variables section below (one `KEY=value` per line).
 
-Before first deploy, edit `backend/scheduler/deploy-scheduler-aws.sh` and set `AWS_ACCOUNT_ID` and `AWS_REGION`.
+Before first deploy, set `ORACLE_VM_HOST` in your shell (or edit the script directly):
+
+```bash
+export ORACLE_VM_HOST=ubuntu@<your-vm-public-ip>
+export SSH_KEY=~/.ssh/your-key   # path to the private key you provisioned with
+```
 
 ## Deployment environments
 
@@ -189,23 +199,36 @@ GET https://<your-render-url>/health
 
 Render dashboard → Deploys → select a prior deploy → Rollback.
 
-## Scheduler deployment — AWS ECS Fargate
+## Scheduler deployment — Oracle Cloud Free Tier
 
 ```bash
-./backend/scheduler/deploy-scheduler-aws.sh prod
+export ORACLE_VM_HOST=ubuntu@<your-vm-public-ip>
+export SSH_KEY=~/.ssh/your-key
+./backend/scheduler/deploy-scheduler-oracle.sh prod
 ```
 
-The script builds the scheduler, pushes the image to ECR, and triggers a new ECS deployment.
+The script builds the scheduler locally, packages it as a Docker image, copies it to the VM via SCP, then loads and restarts the container with `--restart always`.
 
 ### Post-deploy checks
 
-- ECS console shows service stabilized with 1 running task
-- Scheduler logs appear in CloudWatch
-- No crash loop in task events
+- SSH into the VM and confirm: `docker ps --filter name=shell-scheduler-prod`
+- Tail logs: `docker logs -f shell-scheduler-prod`
+- No crash loop (container status stays `Up`, not `Restarting`)
 
 ### Rollback
 
-AWS console → ECS → Clusters → shell → Services → shell-scheduler-prod → Update service → select previous task definition revision.
+The previous image is not automatically retained. To roll back:
+
+1. Check out the previous commit locally: `git checkout <prior-commit> -- backend/scheduler`
+2. Re-run the deploy script — it will rebuild and redeploy that version.
+
+Alternatively, keep a tagged backup before each deploy:
+
+```bash
+ssh $ORACLE_VM_HOST 'docker tag shell-scheduler-prod:latest shell-scheduler-prod:previous'
+```
+
+Then to roll back: `docker stop shell-scheduler-prod && docker run ... shell-scheduler-prod:previous`
 
 ## Supabase schema changes
 
@@ -220,7 +243,7 @@ Apply SQL files from `backend/supabase/` manually via the Supabase dashboard or 
 
 1. Apply any Supabase schema changes
 2. Deploy the API (push to `main`, Render auto-deploys)
-3. Deploy the scheduler if job code changed (`./backend/scheduler/deploy-scheduler-aws.sh prod`)
+3. Deploy the scheduler if job code changed (`./backend/scheduler/deploy-scheduler-oracle.sh prod`)
 4. Deploy web (push to `main`, Vercel auto-deploys)
 5. Run smoke tests
 
@@ -241,7 +264,7 @@ npx tsc --project web/tsconfig.json --noEmit
 5. Place a test trade
 6. Resolve the market
 7. Confirm market page, portfolio, and notifications render
-8. Check API logs (Render dashboard) and scheduler logs (CloudWatch) for errors
+8. Check API logs (Render dashboard) and scheduler logs (`docker logs -f shell-scheduler-prod` on the Oracle VM) for errors
 9. If email is enabled, verify only allowlisted recipients receive mail
 
 ## Rollback
@@ -277,7 +300,7 @@ Before production rollout, verify:
 ## Related files
 
 - `render.yaml`
-- `backend/scheduler/deploy-scheduler-aws.sh`
+- `backend/scheduler/deploy-scheduler-oracle.sh`
 - `.env.example`
 - `README.md`
 - `common/src/secrets.ts`

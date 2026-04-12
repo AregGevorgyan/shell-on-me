@@ -58,6 +58,9 @@ type AnyTxnType =
   | ShopPurchase
   | ShopRefund
   | MembershipPayment
+  | QuestReward
+  | BettingStreakBonus
+  | LeaguePrize
 
 export type AnyTxnCategory = AnyTxnType['category']
 
@@ -564,6 +567,32 @@ type MembershipPayment = {
   }
 }
 
+/** @deprecated streak features removed */
+type BettingStreakBonus = {
+  category: 'BETTING_STREAK_BONUS'
+  fromType: 'BANK'
+  toType: 'USER'
+  token: 'M$'
+}
+
+/** @deprecated quest features removed */
+type QuestReward = {
+  category: 'QUEST_REWARD'
+  fromType: 'BANK'
+  toType: 'USER'
+  token: 'M$'
+  data: { questType?: string }
+}
+
+/** @deprecated league features removed */
+type LeaguePrize = {
+  category: 'LEAGUE_PRIZE'
+  fromType: 'BANK'
+  toType: 'USER'
+  token: 'M$'
+}
+
+export type QuestRewardTxn = Txn & QuestReward
 export type AddSubsidyTxn = Txn & AddSubsidy
 export type RemoveSubsidyTxn = Txn & RemoveSubsidy
 export type DonationTxn = Txn & Donation

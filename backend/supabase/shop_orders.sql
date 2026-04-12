@@ -16,6 +16,16 @@ create table if not exists
     user_id text not null
   );
 
+-- Row Level Security
+alter table shop_orders enable row level security;
+
+-- Policies
+drop policy if exists "user read own" on shop_orders;
+
+create policy "user read own" on shop_orders for
+select
+  using (firebase_uid () = user_id);
+
 -- Indexes
 drop index if exists shop_orders_pkey;
 

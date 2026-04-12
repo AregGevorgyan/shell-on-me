@@ -273,7 +273,7 @@ export function QuestIncomeNotification(props: {
       <span className="line-clamp-3">
         <IncomeNotificationLabel notification={notification} /> Bonus for{' '}
         <PrimaryNotificationLink
-          text={`completing the ${QUEST_DETAILS[questType].title} quest`}
+          text={`completing the ${questType ? QUEST_DETAILS[questType as import('common/quest').QuestType]?.title ?? questType : 'quest'}`}
         />
       </span>
       {user && <QuestsModal open={open} setOpen={setOpen} user={user} />}

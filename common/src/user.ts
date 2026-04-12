@@ -108,6 +108,11 @@ export type User = {
 
   // Entitlements - digital goods owned by this user (from user_entitlements table)
   entitlements?: UserEntitlement[]
+
+  /** @deprecated streak features removed */
+  streakForgiveness?: number
+  /** @deprecated streak features removed */
+  currentBettingStreak?: number
 }
 
 export type PrivateUser = {

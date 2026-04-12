@@ -618,7 +618,7 @@ const txnTitle = (change: TxnBalanceChange) => {
 
   switch (type) {
     case 'QUEST_REWARD':
-      return questType ? questTypeToDescription(questType) : ''
+      return questType ? questTypeToDescription(questType as QuestType) : ''
     case 'BETTING_STREAK_BONUS':
       return 'Prediction streak bonus' // usually the question instead
     case 'ADMIN_REWARD':

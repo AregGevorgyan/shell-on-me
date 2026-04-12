@@ -191,7 +191,6 @@ export const notificationReasonToSubscriptionType: Partial<
   user_joined_to_bet_on_your_market: 'referral_bonuses',
   bet_fill: 'limit_order_fills',
   user_joined_from_your_group_invite: 'referral_bonuses',
-  betting_streak_incremented: 'betting_streaks',
   comment_on_your_contract: 'all_comments_on_my_markets',
   answer_on_your_contract: 'all_answers_on_my_markets',
   comment_on_contract_you_follow: 'all_comments_on_watched_markets',

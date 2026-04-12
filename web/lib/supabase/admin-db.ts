@@ -1,5 +1,4 @@
 import { ENV } from 'common/envs/constants'
-import { getSecrets, getServiceAccountCredentials } from 'common/secrets'
 import { createClient } from 'common/supabase/utils'
 import { getSupabaseInstanceId } from './db'
 
@@ -12,11 +11,8 @@ let key =
 export async function initSupabaseAdmin() {
   if (key == null) {
     console.warn(
-      'Loading Supabase key from GCP. (Should happen only locally, never in production!)'
+      'PROD_ADMIN_SUPABASE_KEY / DEV_ADMIN_SUPABASE_KEY not set. Admin Supabase client unavailable.'
     )
-    const creds = getServiceAccountCredentials(ENV)
-    const result = await getSecrets(creds, 'SUPABASE_KEY')
-    key = result['SUPABASE_KEY']
   }
-  return createClient(getSupabaseInstanceId(), key)
+  return createClient(getSupabaseInstanceId(), key ?? '')
 }

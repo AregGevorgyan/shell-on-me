@@ -267,7 +267,7 @@ function groupGeneralNotifications(
     sortedNotifications.filter((n) => !except.includes(n.reason)),
     (n) =>
       new Date(n.createdTime).toDateString() +
-      (n.sourceType === 'betting_streak_bonus' || n.reason === 'quest_payout'
+      ((n.sourceType as string) === 'betting_streak_bonus' || n.reason === 'quest_payout'
         ? 'quest_payout'
         : n.sourceType === 'love_like'
         ? 'love_like'

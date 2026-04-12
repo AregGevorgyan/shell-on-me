@@ -6,6 +6,16 @@ create table if not exists
     date_pt text primary key not null
   );
 
+-- Row Level Security
+alter table predictle_daily enable row level security;
+
+-- Policies
+drop policy if exists "public read" on predictle_daily;
+
+create policy "public read" on predictle_daily for
+select
+  using (true);
+
 -- Indexes
 drop index if exists predictle_daily_pkey;
 

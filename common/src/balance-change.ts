@@ -44,6 +44,8 @@ export type TxnBalanceChange = BalanceChange & {
   charity?: { name: string; slug: string }
   description?: string
   answerText?: string
+  /** @deprecated quest features removed */
+  questType?: string
 }
 
 export const isBetChange = (

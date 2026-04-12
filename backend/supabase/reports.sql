@@ -13,6 +13,16 @@ create table if not exists
     dismissed_by_user_id text
   );
 
+-- Row Level Security
+alter table reports enable row level security;
+
+-- Policies
+drop policy if exists "user insert own" on reports;
+
+create policy "user insert own" on reports for
+insert
+  with check (firebase_uid () = user_id);
+
 -- Foreign Keys
 alter table reports
 add constraint reports_content_owner_id_fkey foreign key (content_owner_id) references users (id);

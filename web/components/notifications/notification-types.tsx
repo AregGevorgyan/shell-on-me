@@ -115,7 +115,7 @@ export function NotificationItem(props: {
         setHighlighted={setHighlighted}
       />
     )
-  } else if (sourceType === 'quest_reward') {
+  } else if ((sourceType as string) === 'quest_reward') {
     return (
       <QuestIncomeNotification
         notification={notification}
@@ -123,7 +123,7 @@ export function NotificationItem(props: {
         setHighlighted={setHighlighted}
       />
     )
-  } else if (sourceType === 'betting_streak_bonus') {
+  } else if ((sourceType as string) === 'betting_streak_bonus') {
     return (
       <BettingStreakBonusIncomeNotification
         notification={notification}
@@ -131,7 +131,7 @@ export function NotificationItem(props: {
         setHighlighted={setHighlighted}
       />
     )
-  } else if (sourceType === 'betting_streak_expiring') {
+  } else if ((sourceType as string) === 'betting_streak_expiring') {
     return (
       <BettingStreakExpiringNotification
         notification={notification}

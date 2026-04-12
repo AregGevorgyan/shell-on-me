@@ -9,6 +9,16 @@ create table if not exists
     won boolean not null
   );
 
+-- Row Level Security
+alter table predictle_results enable row level security;
+
+-- Policies
+drop policy if exists "user read own" on predictle_results;
+
+create policy "user read own" on predictle_results for
+select
+  using (firebase_uid () = user_id);
+
 -- Indexes
 drop index if exists idx_predictle_results_puzzle_number;
 

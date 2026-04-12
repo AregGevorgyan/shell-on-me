@@ -472,7 +472,8 @@ function NotificationGroupItem(props: {
   )
   const questNotifs = notifications.some(
     (n) =>
-      n.reason === 'quest_payout' || n.sourceType === 'betting_streak_bonus'
+      n.reason === 'quest_payout' ||
+      (n.sourceType as string) === 'betting_streak_bonus'
   )
 
   return (

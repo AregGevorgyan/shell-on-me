@@ -345,11 +345,35 @@ export const NOTIFICATION_DESCRIPTIONS: notification_descriptions = {
     simple: 'Admin notifications',
     detailed: 'Notifications from the Manifold team',
   },
+  betting_streaks: {
+    simple: 'Prediction streak bonuses',
+    detailed: 'Bonuses for your prediction streaks',
+  },
+  quest_payout: {
+    simple: 'Quest rewards',
+    detailed: 'Rewards for completing quests',
+  },
+  league_changed: {
+    simple: 'League changes',
+    detailed: 'When you are promoted, demoted, or placed in a league',
+  },
   all_comments_on_followed_posts: {
     simple: 'All new comments on posts you follow',
     detailed: 'All new comments on posts you follow',
     verb: 'commented',
   },
+}
+
+export type BettingStreakData = {
+  streak: number
+  bonusAmount?: number
+  cashAmount?: number
+}
+
+export type LeagueChangeData = {
+  previousLeague?: { division: number; rank: number }
+  newLeague: { division: number }
+  bonusAmount: number
 }
 
 export type BetFillData = {

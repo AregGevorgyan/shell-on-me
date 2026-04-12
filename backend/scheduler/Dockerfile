@@ -13,4 +13,4 @@ COPY dist ./
 ENV PORT=80
 EXPOSE 80/tcp
 
-ENTRYPOINT [ "node", "--max-old-space-size=1024", "backend/scheduler/lib/index.js" ]
+ENTRYPOINT [ "node", "--max-old-space-size=512", "backend/scheduler/lib/index.js" ]

@@ -12,6 +12,9 @@ create table if not exists
     user_id text not null
   );
 
+-- Row Level Security
+alter table user_bans enable row level security;
+
 -- Foreign Keys
 alter table user_bans
 add constraint user_bans_created_by_fkey foreign key (created_by) references users (id);

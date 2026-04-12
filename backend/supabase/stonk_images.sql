@@ -5,6 +5,16 @@ create table if not exists
     image_url text not null
   );
 
+-- Row Level Security
+alter table stonk_images enable row level security;
+
+-- Policies
+drop policy if exists "public read" on stonk_images;
+
+create policy "public read" on stonk_images for
+select
+  using (true);
+
 -- Indexes
 drop index if exists stonk_images_pkey;
 

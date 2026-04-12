@@ -10,6 +10,9 @@ create table if not exists
     user_id text not null
   );
 
+-- Row Level Security
+alter table mod_reports enable row level security;
+
 -- Indexes
 drop index if exists mod_reports_pkey;
 

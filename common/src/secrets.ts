@@ -49,6 +49,18 @@ export const getSecrets = async (_credentials?: any, ...ids: SecretId[]) => {
   return Object.fromEntries(pairs)
 }
 
+// Returns a parsed Firebase service account credentials object.
+// Reads from FIREBASE_SERVICE_ACCOUNT_KEY env var (set in Render/local .env).
+export const getServiceAccountCredentials = (_env?: string) => {
+  const key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
+  if (!key) {
+    throw new Error(
+      'FIREBASE_SERVICE_ACCOUNT_KEY not set. Set it as a JSON string env var.'
+    )
+  }
+  return JSON.parse(key)
+}
+
 // Loads secrets into process.env (no-op on Render/ECS where they're already set,
 // but keeps the same interface for local dev compatibility).
 export const loadSecretsToEnv = async (_credentials?: any) => {

@@ -10,6 +10,16 @@ create table if not exists
     constraint primary key (user_id, entitlement_id)
   );
 
+-- Row Level Security
+alter table user_entitlements enable row level security;
+
+-- Policies
+drop policy if exists "user read own" on user_entitlements;
+
+create policy "user read own" on user_entitlements for
+select
+  using (firebase_uid () = user_id);
+
 -- Indexes
 drop index if exists user_entitlements_pkey;
 

@@ -3,6 +3,7 @@ import {
   ChevronDownIcon,
   PresentationChartLineIcon,
   ScaleIcon,
+  StarIcon,
   ViewListIcon,
 } from '@heroicons/react/outline'
 import clsx from 'clsx'
@@ -425,7 +426,7 @@ function UserProfile(props: {
               {
                 title: 'Achievements',
                 prerender: true,
-                stackedTabIcon: <TrophyIcon className="h-5" />,
+                stackedTabIcon: <StarIcon className="h-5" />,
                 content: (
                   <>
                     <Spacer h={4} />
